@@ -69,6 +69,15 @@ int main ()
     const int gravity {1'000}; // (pixels/s)/s
 
 
+    // Background image loading
+    Texture2D background = LoadTexture("Textures/parallax-forest-back-trees.png");
+    // Creating a float to help the background move with a variable
+    float bgX{};
+    Texture2D midground = LoadTexture("Textures/parallax-forest-middle-trees.png");
+    float mgX{};
+    Texture2D foreground = LoadTexture("Textures/parallax-forest-front-trees.png");
+    float fgX{};
+
     // Starting with basic setup, FPS, while loop, begin drawing
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
     SetTargetFPS(60);
@@ -83,7 +92,49 @@ int main ()
         BeginDrawing();
         ClearBackground(WHITE);
 
+        // Movement for the background, conditional to bring it back again. 
+        bgX -= 20 * dt;
+        if (bgX <= -background.width*5)
+        {
+            bgX = 0;
+        }
 
+        mgX -= 40 * dt; // Same for midground
+        if (mgX <= -midground.width*5)
+        {
+            mgX = 0;
+        }
+        
+        fgX -= 80 * dt; // Same for background
+        if (fgX <= -foreground.width*5)
+        {
+            fgX = 0;
+        }
+
+        //Draw background, drawtextureex adds a scaling parameter
+        // Since the background images are quite small, I am using x5 the size
+        // Also using two images so we can loop them
+        Vector2 bg1Pos{bgX, 0.0};
+        DrawTextureEx(background, bg1Pos, 0.0, 5.0, WHITE);
+        Vector2 bg2Pos{bgX + background.width*5, 0.0}; // this duplicates the background, *5 because that is the lenght of the scaled texture
+        DrawTextureEx(background, bg2Pos, 0.0, 5.0, WHITE);
+
+        Vector2 mg1Pos{mgX, 0.0};
+        DrawTextureEx(midground, mg1Pos, 0.0, 5.0, WHITE);
+        Vector2 mg2Pos{mgX + midground.width*5, 0.0}; // this duplicates the midground
+        DrawTextureEx(midground, mg2Pos, 0.0, 5.0, WHITE);
+
+        Vector2 fg1Pos{fgX, 0.0};
+        DrawTextureEx(foreground, fg1Pos, 0.0, 5.0, WHITE);
+        Vector2 fg2Pos{fgX + foreground.width*5, 0.0}; // this duplicates the midground
+        DrawTextureEx(foreground, fg2Pos, 0.0, 5.0, WHITE);
+        
+
+
+
+
+
+        
         // Gravity action
         velocity += gravity * dt;
     
@@ -119,6 +170,9 @@ int main ()
     
     //Unload textures
     UnloadTexture(flappy);
+    UnloadTexture(background);
+    UnloadTexture(midground);
+    UnloadTexture(foreground);
 
     // Close Window and Unload Textures
     CloseWindow();
