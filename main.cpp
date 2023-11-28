@@ -47,6 +47,33 @@ int main ()
     const int windowHeight {1080};
     InitWindow( windowWidth, windowHeight, "All my flappys");
 
+    // Trees on fire Obstacles variables
+    Texture2D tree = LoadTexture("textures/fire.png"); // They should be trees on fire but for now just fire
+
+    const int sizeOfTrees{5};
+    // Array of trees / fire
+    AnimData trees[sizeOfTrees]{};
+ 
+    // 5 trees will come up with 300 pixels separation
+    for (int i = 0; i < sizeOfTrees; i++)
+    {
+        trees[i].rec.x = 0.0;
+        trees[i].rec.y = 0.0;
+        trees[i].rec.width = tree.width/4;
+        trees[i].rec.height = tree.height/5;
+        trees[i].pos.y = windowHeight - 1000;    // tree.height/4; // Trees appear at ground level
+        trees[i].frame = 0;
+        trees[i].runningTime = 0.0;
+        trees[i].updateTime = 1.0/16.0;
+        trees[i].pos.x = windowWidth + i * 300;
+    }
+
+
+    // Nebula animation variables
+    int treeVel {-200};
+
+ 
+
 
      // Flappy variables, code from same project as Struct, changed all details from scarfy to flappy. 
     Texture2D flappy = LoadTexture("textures/flappy.png");
@@ -66,7 +93,7 @@ int main ()
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    const int gravity {1'000}; // (pixels/s)/s
+    const int gravity {900}; // (pixels/s)/s - Lowering gravity
 
 
     // Background image loading
@@ -150,6 +177,14 @@ int main ()
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
 
+        // Update position of Trees/Fire
+        for (int i = 0; i < sizeOfTrees; i++)
+        {
+            // Update the position of each tree
+            trees[i].pos.x += treeVel * dt;
+        }
+
+
         // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
         // we update the frame but also restart the timer eventurally. 
         // Original code stops animation when in the air, I will do the same if space bar is pressed. 
@@ -160,6 +195,15 @@ int main ()
 
         // Draw Flappy
         DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
+
+        // Draw all trees
+        for (int i = 0; i < sizeOfTrees; i++)
+        {
+           trees[i] = updateAnimData (trees[i], dt, 5); 
+           
+            // Draw each tree
+            DrawTextureRec(tree, trees[i].rec, trees[i].pos, WHITE);
+        }
 
 
         // End Drawing
@@ -173,6 +217,7 @@ int main ()
     UnloadTexture(background);
     UnloadTexture(midground);
     UnloadTexture(foreground);
+    UnloadTexture(tree);
 
     // Close Window and Unload Textures
     CloseWindow();
