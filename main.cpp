@@ -11,6 +11,14 @@ struct AnimData
     float runningTime;
 };
 
+// This is to check if the character touches the ground - I might add aswell if crosses the sky limit
+bool isOnGround(AnimData data, int windowHeight)
+{
+    return data.pos.y >= windowHeight - data.rec.height;
+}
+
+
+
 
 
 AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
@@ -43,8 +51,8 @@ int main ()
    /* Creating constants for the screen size
     * I am opting for the size of a full screen
     * as the game should be played on a phone horizontally */
-    const int windowWidth {1920};
-    const int windowHeight {1080};
+    const int windowWidth {1360}; // Reduce dimensions that match background ration
+    const int windowHeight {800};
     InitWindow( windowWidth, windowHeight, "All my flappys");
 
     // Trees on fire Obstacles variables
@@ -89,11 +97,11 @@ int main ()
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
 
     // Need to setup flap action, jumplike, negative in Y axis
-    const int flapVel{-600}; // (Pixels/s)/s    
+    const int flapVel{-400}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    const int gravity {900}; // (pixels/s)/s - Lowering gravity
+    const int gravity {400}; // (pixels/s)/s - Lowering gravity
 
 
     // Background image loading
@@ -104,6 +112,9 @@ int main ()
     float mgX{};
     Texture2D foreground = LoadTexture("Textures/parallax-forest-front-trees.png");
     float fgX{};
+
+    // Set this to finish the game when touching the ground or an obstacle
+    bool gameOver = false;
 
     // Starting with basic setup, FPS, while loop, begin drawing
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
@@ -126,13 +137,13 @@ int main ()
             bgX = 0;
         }
 
-        mgX -= 40 * dt; // Same for midground
+        mgX -= 50 * dt; // Same for midground
         if (mgX <= -midground.width*5)
         {
             mgX = 0;
         }
         
-        fgX -= 80 * dt; // Same for background
+        fgX -= 100 * dt; // Same for background
         if (fgX <= -foreground.width*5)
         {
             fgX = 0;
@@ -204,6 +215,17 @@ int main ()
             // Draw each tree
             DrawTextureRec(tree, trees[i].rec, trees[i].pos, WHITE);
         }
+
+        // Check for game over conditions
+        if (isOnGround(flappyData, windowHeight)) {
+            gameOver = true;
+        }
+
+        if (gameOver) {
+    DrawText("Who will save your flappys now", 100, 100, 20, BLACK);
+        }
+
+
 
 
         // End Drawing
