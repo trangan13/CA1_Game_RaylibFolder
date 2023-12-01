@@ -68,6 +68,10 @@ int main ()
     // Array of tree1
     AnimData trees1[sizeOfTree1]{};
 
+    // Random value did not work very well for the logic, as multiplying by i makes distances longer everytime, I need to generate a value and add it to a variable
+    // https://community.gamedev.tv/t/can-i-improve-dapper-dasher-how/206459/6 
+    int trees1Total {0};
+
     for (int i = 0; i < sizeOfTree1; i++)
     {
         trees1[i].rec.x = 0.0;
@@ -78,13 +82,16 @@ int main ()
         trees1[i].frame = 0;
         trees1[i].runningTime = 0.0;
         trees1[i].updateTime = 1.0/16.0;
-        trees1[i].pos.x = windowWidth + i * 2000;
+
+        // I will add to trees total 
+        trees1Total += GetRandomValue(500,3000);
+        trees1[i].pos.x = windowWidth + trees1Total; // https://www.raylib.com/examples/core/loader.html?name=core_random_values
         trees1[i].flappyCount = 0; // null for trees
     }
 
         // Array of tree2
     AnimData trees2[sizeOfTree2]{};
-
+    int trees2Total {0};
     for (int i = 0; i < sizeOfTree2; i++)
     {
         trees2[i].rec.x = 0.0;
@@ -95,14 +102,16 @@ int main ()
         trees2[i].frame = 0;
         trees2[i].runningTime = 0.0;
         trees2[i].updateTime = 1.0/16.0;
-        trees2[i].pos.x = windowWidth + i * 1000;
+
+        trees2Total += GetRandomValue(3000,5000);
+        trees2[i].pos.x = windowWidth + trees2Total;
         trees2[i].flappyCount = 0; // null for trees
         
     }
 
             // Array of branches
     AnimData branches[sizeOfBranch]{};
-
+    int branchTotal {0};
     for (int i = 0; i < sizeOfBranch; i++)
     {
         branches[i].rec.x = 0.0;
@@ -113,7 +122,9 @@ int main ()
         branches[i].frame = 0;
         branches[i].runningTime = 0.0;
         branches[i].updateTime = 1.0/16.0;
-        branches[i].pos.x = windowWidth + i * 1500;
+
+        branchTotal += GetRandomValue(1000,3500);
+        branches[i].pos.x = windowWidth + branchTotal;
         branches[i].flappyCount = 0; // null for trees
         
     }
