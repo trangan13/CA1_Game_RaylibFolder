@@ -9,6 +9,7 @@ struct AnimData
     int frame;
     float updateTime;
     float runningTime;
+    int flappyCount; // Adding this to be able to change the animation on the y axis
 };
 
 // This is to check if the character touches the ground - I might add aswell if crosses the sky limit
@@ -25,6 +26,7 @@ AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
 {
 // update running time
 data.runningTime += deltaTime;
+data.rec.y = data.flappyCount * data.rec.height/4; // I think this will let me change the animation when Flappy catches children, still need to test changing flappy count
 if (data.runningTime >= data.updateTime) // check if running time has reached or exceded updateTime
 {
     data.runningTime = 0.0;
@@ -87,11 +89,11 @@ int main ()
     Texture2D flappy = LoadTexture("textures/flappy.png");
     AnimData flappyData;
     flappyData.rec.width = flappy.width/4; // changed this to match the current size of my sprite which is only 4 frames
-    flappyData.rec.height = flappy.height;
+    flappyData.rec.height = flappy.height/4; // Updated to match the new sprite with the birds
     flappyData.rec.x = 0;
     flappyData.rec.y = 0;
-    flappyData.pos.x = windowWidth/3 - flappyData.rec.width/4;
-    flappyData.pos.y = windowHeight - flappyData.rec.height;
+    flappyData.pos.x = windowWidth/3 - flappyData.rec.width/4; // 
+    flappyData.pos.y = windowHeight/2 - flappyData.rec.height; // change this for flappy to appear in the middle
     flappyData.frame = 0; 
     flappyData.runningTime = 0.0;
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
