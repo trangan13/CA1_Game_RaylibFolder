@@ -19,9 +19,7 @@ bool isOnGround(AnimData data, int windowHeight)
 }
 
 
-
-
-
+// This is a function for updating animation frames for all objects https://www.udemy.com/course/cpp-fundamentals/learn/lecture/26799168#overview
 AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
 {
 // update running time
@@ -57,32 +55,54 @@ int main ()
     const int windowHeight {800};
     InitWindow( windowWidth, windowHeight, "All my flappys");
 
-    // Trees on fire Obstacles variables
-    Texture2D tree = LoadTexture("textures/fire.png"); // They should be trees on fire but for now just fire
+    // Trees on fire Obstacles variables, I have opten for 2 different trees and 1 branch
+    Texture2D tree1 = LoadTexture("textures/tree1.png"); // They should be trees on fire but for now just fire
+    Texture2D tree2 = LoadTexture("textures/tree2.png");
+    Texture2D branch = LoadTexture("textures/branch.png");
 
-    const int sizeOfTrees{5};
-    // Array of trees / fire
-    AnimData trees[sizeOfTrees]{};
- 
-    // 5 trees will come up with 300 pixels separation
-    for (int i = 0; i < sizeOfTrees; i++)
+    // Setting up the array to 5 for now, will experiment. 
+    const int sizeOfTree1{5};
+    const int sizeOfTree2{5};
+    const int sizeOfBranch{5};
+    
+    // Array of tree1
+    AnimData trees1[sizeOfTree1]{};
+
+    for (int i = 0; i < sizeOfTree1; i++)
     {
-        trees[i].rec.x = 0.0;
-        trees[i].rec.y = 0.0;
-        trees[i].rec.width = tree.width/4;
-        trees[i].rec.height = tree.height/5;
-        trees[i].pos.y = windowHeight - 1000;    // tree.height/4; // Trees appear at ground level
-        trees[i].frame = 0;
-        trees[i].runningTime = 0.0;
-        trees[i].updateTime = 1.0/16.0;
-        trees[i].pos.x = windowWidth + i * 300;
+        trees1[i].rec.x = 0.0;
+        trees1[i].rec.y = 0.0;
+        trees1[i].rec.width = tree1.width/4;
+        trees1[i].rec.height = tree1.height;
+        trees1[i].pos.y = windowHeight - tree1.height; // Trees appear at ground level
+        trees1[i].frame = 0;
+        trees1[i].runningTime = 0.0;
+        trees1[i].updateTime = 1.0/16.0;
+        trees1[i].pos.x = windowWidth + i * 300;
+    }
+
+        // Array of tree2
+    AnimData trees2[sizeOfTree2]{};
+
+    for (int i = 0; i < sizeOfTree2; i++)
+    {
+        trees2[i].rec.x = 0.0;
+        trees2[i].rec.y = 0.0;
+        trees2[i].rec.width = tree2.width/4;
+        trees2[i].rec.height = tree2.height;
+        trees2[i].pos.y = windowHeight - tree2.height; // Trees appear at ground level
+        trees2[i].frame = 0;
+        trees2[i].runningTime = 0.0;
+        trees2[i].updateTime = 1.0/16.0;
+        trees2[i].pos.x = windowWidth + i * 1000;
     }
 
 
-    // Nebula animation variables
-    int treeVel {-200};
 
- 
+
+
+    // Tree movement animation variables
+    int treeVel {-200};
 
 
      // Flappy variables, code from same project as Struct, changed all details from scarfy to flappy. 
@@ -97,6 +117,7 @@ int main ()
     flappyData.frame = 0; 
     flappyData.runningTime = 0.0;
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
+    flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
     // Need to setup flap action, jumplike, negative in Y axis
     const int flapVel{-400}; // (Pixels/s)/s    
@@ -190,34 +211,61 @@ int main ()
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
 
-        // Update position of Trees/Fire
-        for (int i = 0; i < sizeOfTrees; i++)
+        // Update position of Trees1
+        for (int i = 0; i < sizeOfTree1; i++)
         {
             // Update the position of each tree
-            trees[i].pos.x += treeVel * dt;
+            trees1[i].pos.x += treeVel * dt;
+        }
+        // Update position of Trees2
+        for (int i = 0; i < sizeOfTree2; i++)
+        {
+            // Update the position of each tree
+            trees2[i].pos.x += treeVel * dt;
         }
 
 
         // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
-        // we update the frame but also restart the timer eventurally. 
+        // we update the frame but also restart the timer eventually. 
         // Original code stops animation when in the air, I will do the same if space bar is pressed. 
        if(!IsKeyPressed(KEY_SPACE))
        { 
-            flappyData = updateAnimData (flappyData, dt, 5);
+            flappyData = updateAnimData (flappyData, dt, 4);
        }
 
         // Draw Flappy
         DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
 
-        // Draw all trees
-        for (int i = 0; i < sizeOfTrees; i++)
+        // Draw all trees1 - using the same function as Flappy
+        for (int i = 0; i < sizeOfTree1; i++)
         {
-           trees[i] = updateAnimData (trees[i], dt, 5); 
+           trees1[i] = updateAnimData (trees1[i], dt, 4); 
            
             // Draw each tree
-            DrawTextureRec(tree, trees[i].rec, trees[i].pos, WHITE);
+            DrawTextureRec(tree1, trees1[i].rec, trees1[i].pos, WHITE);
         }
-
+        // Draw all trees2 - using the same function as Flappy
+        for (int i = 0; i < sizeOfTree2; i++)
+        {
+           trees2[i] = updateAnimData (trees2[i], dt, 4); 
+           
+            // Draw each tree
+            DrawTextureRec(tree2, trees2[i].rec, trees2[i].pos, WHITE);
+        }
+        
+        
+        
+        
+        
+        
+        // Need to draw other trees and then the branches, I need to randomize more
+        
+        
+        
+        
+        
+        
+        
         // Check for game over conditions
         if (isOnGround(flappyData, windowHeight)) {
             gameOver = true;
@@ -242,7 +290,9 @@ int main ()
     UnloadTexture(background);
     UnloadTexture(midground);
     UnloadTexture(foreground);
-    UnloadTexture(tree);
+    UnloadTexture(tree1);
+    UnloadTexture(tree2);
+    UnloadTexture(branch);
 
     // Close Window and Unload Textures
     CloseWindow();
