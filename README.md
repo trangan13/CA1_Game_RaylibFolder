@@ -9,7 +9,7 @@ Code References:
 
 Character Sprites:
 - Pink Bird, free for use: https://lpc.opengameart.org/content/pink-flappy-bird-sprite-sheets
-- For the baby birds I used the same prite just chnaged colour.
+- For the baby birds I used the same prite just changed colour.
 
 Background
 - Forest: https://ansimuz.itch.io/parallax-forest
