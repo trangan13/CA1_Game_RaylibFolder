@@ -224,7 +224,8 @@ int main ()
         }
 
         if (gameOver) {
-    DrawText("Who will save your flappys now", 100, 100, 20, BLACK);
+     DrawText("Who will save your flappys now", windowWidth/2-352, windowHeight/2-48,  50, BLACK); // Added a second one for visibility
+     DrawText("Who will save your flappys now", windowWidth/2-350, windowHeight/2-50,  50, RED);
         }
 
 
