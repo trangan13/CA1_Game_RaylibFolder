@@ -180,7 +180,7 @@ int main ()
     
     
     // Flappies movement animation
-    int flappiesVel {-150};
+    int flappiesVel {-120};
 
 
 
@@ -199,11 +199,11 @@ int main ()
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
     // Need to setup flap 
-    const int flapVel{-400}; // (Pixels/s)/s    
+    const int flapVel{-600}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    const int gravity {400}; // (pixels/s)/s
+    const int gravity {800}; // (pixels/s)/s
 
 
     // Background image loading
@@ -214,6 +214,13 @@ int main ()
     float mgX{};
     Texture2D foreground = LoadTexture("Textures/parallax-forest-front-trees.png");
     float fgX{};
+
+    // Set bools for collisions
+    bool collisionTree = false;
+    bool collisionFlappyB = false;
+    bool collisionFlappyG = false;
+    bool collisionFlappyY = false;
+
 
     // Set this to finish the game when touching the ground or an obstacle
     bool gameOver = false;
@@ -312,6 +319,31 @@ int main ()
             // Update the position of each tree
             branches[i].pos.x += treeVel * dt;
         }
+        // Check for collisions, it did not work to have them in one for loop
+        for (int i = 0; i < sizeOfTree1; i++)
+        {
+            if (CheckCollisionRecs(flappyData.rec, trees1[i].rec))
+            {
+                bool collisionTree = true;
+            }
+            
+        }
+        for (int i = 0; i < sizeOfTree2; i++)
+        {
+            if (CheckCollisionRecs(flappyData.rec, trees2[i].rec))
+            {
+                bool collisionTree = true;
+            }
+        }
+        // Update position of Branch
+        for (int i = 0; i < sizeOfBranch; i++)
+        {
+            if (CheckCollisionRecs(flappyData.rec, trees2[i].rec))
+            {
+                bool collisionTree = true;
+            }
+        }
+        
 
         // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
         // we update the frame but also restart the timer eventually. 
@@ -324,8 +356,11 @@ int main ()
         flappyGData = updateAnimData(flappyGData, dt, 4);
         flappyYData = updateAnimData(flappyYData, dt, 4);
 
-        // Draw Flappy
-        DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
+        // Draw Flappy - Adding a gameover condition to stop drawing when we die
+        if (!gameOver){
+            DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
+        }
+        
 
         // Draw Flappies
         DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
@@ -366,6 +401,9 @@ int main ()
         
         // Check for game over conditions
         if (isOnGround(flappyData, windowHeight)) {
+            gameOver = true;
+        }
+        if (collisionTree) {
             gameOver = true;
         }
 
