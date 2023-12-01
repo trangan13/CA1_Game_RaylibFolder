@@ -128,13 +128,60 @@ int main ()
         branches[i].flappyCount = 0; // null for trees
         
     }
-
-
-
-
-
     // Tree movement animation variables
     int treeVel {-200};
+
+    // FlappyBabies animation
+    Texture2D flappyB = LoadTexture("textures/FlappyB.png"); 
+    Texture2D flappyG = LoadTexture("textures/FlappyG.png");
+    Texture2D flappyY = LoadTexture("textures/FlappyY.png");
+     // Copied the same elements as the main flappy, only correcting the height
+    int flappiesTotal {0}; // Using the same strategy as the trees to randomize
+    AnimData flappyBData;
+    flappyBData.rec.width = flappyB.width/4; 
+    flappyBData.rec.height = flappyB.height; // Updated to all small bird sprites
+    flappyBData.rec.x = 0;
+    flappyBData.rec.y = 0;
+    flappiesTotal += GetRandomValue(500,1000);
+    flappyBData.pos.x = windowWidth + flappiesTotal; // So they start outside the screen a bit randomly
+    flappyBData.pos.y = windowHeight/2 - flappyBData.rec.height; 
+    flappyBData.frame = 0; 
+    flappyBData.runningTime = 0.0;
+    flappyBData.updateTime = 1.0/24.0; // faster flapping than mom
+    flappyBData.flappyCount = 0; // 
+    // Flappy G
+    AnimData flappyGData;
+    flappyGData.rec.width = flappyG.width/4; 
+    flappyGData.rec.height = flappyG.height; // Updated to all small bird sprites
+    flappyGData.rec.x = 0;
+    flappyGData.rec.y = 0;
+
+    flappiesTotal += GetRandomValue(1000,2000);
+    flappyGData.pos.x = windowWidth + flappiesTotal;
+    flappyGData.pos.y = windowHeight/2 - flappyGData.rec.height; 
+    flappyGData.frame = 0; 
+    flappyGData.runningTime = 0.0;
+    flappyGData.updateTime = 1.0/24.0; // faster flapping than mom
+    flappyGData.flappyCount = 0; // 
+    // Flappy Y
+     AnimData flappyYData;
+    flappyYData.rec.width = flappyY.width/4; 
+    flappyYData.rec.height = flappyY.height; // Updated to all small bird sprites
+    flappyYData.rec.x = 0;
+    flappyYData.rec.y = 0;
+    
+    flappiesTotal += GetRandomValue(1000,2000);
+    flappyYData.pos.x = windowWidth + flappiesTotal; 
+    flappyYData.pos.y = windowHeight/2 - flappyYData.rec.height; 
+    flappyYData.frame = 0; 
+    flappyYData.runningTime = 0.0;
+    flappyYData.updateTime = 1.0/24.0; // faster flapping than mom
+    flappyYData.flappyCount = 0; // 
+    
+    
+    // Flappies movement animation
+    int flappiesVel {-150};
+
 
 
      // Flappy variables, code from same project as Struct, changed all details from scarfy to flappy. 
@@ -151,12 +198,12 @@ int main ()
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
-    // Need to setup flap action, jumplike, negative in Y axis
+    // Need to setup flap 
     const int flapVel{-400}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    const int gravity {400}; // (pixels/s)/s - Lowering gravity
+    const int gravity {400}; // (pixels/s)/s
 
 
     // Background image loading
@@ -240,6 +287,12 @@ int main ()
 
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
+        // Update position of flappies
+        flappyBData.pos.x += flappiesVel * dt;
+        flappyGData.pos.x += flappiesVel * dt;
+        flappyYData.pos.x += flappiesVel * dt;
+
+        
 
         // Update position of Trees1
         for (int i = 0; i < sizeOfTree1; i++)
@@ -267,10 +320,19 @@ int main ()
        { 
             flappyData = updateAnimData (flappyData, dt, 4);
        }
+        flappyBData = updateAnimData(flappyBData, dt, 4);
+        flappyGData = updateAnimData(flappyGData, dt, 4);
+        flappyYData = updateAnimData(flappyYData, dt, 4);
 
         // Draw Flappy
         DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
 
+        // Draw Flappies
+        DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
+        DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
+        DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
+       
+       
         // Draw all trees1 - using the same function as Flappy
         for (int i = 0; i < sizeOfTree1; i++)
         {
