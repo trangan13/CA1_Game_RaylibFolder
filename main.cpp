@@ -78,7 +78,8 @@ int main ()
         trees1[i].frame = 0;
         trees1[i].runningTime = 0.0;
         trees1[i].updateTime = 1.0/16.0;
-        trees1[i].pos.x = windowWidth + i * 300;
+        trees1[i].pos.x = windowWidth + i * 2000;
+        trees1[i].flappyCount = 0; // null for trees
     }
 
         // Array of tree2
@@ -95,6 +96,26 @@ int main ()
         trees2[i].runningTime = 0.0;
         trees2[i].updateTime = 1.0/16.0;
         trees2[i].pos.x = windowWidth + i * 1000;
+        trees2[i].flappyCount = 0; // null for trees
+        
+    }
+
+            // Array of branches
+    AnimData branches[sizeOfBranch]{};
+
+    for (int i = 0; i < sizeOfBranch; i++)
+    {
+        branches[i].rec.x = 0.0;
+        branches[i].rec.y = 0.0;
+        branches[i].rec.width = branch.width/4;
+        branches[i].rec.height = branch.height;
+        branches[i].pos.y = 0; // Branches appear at the top right
+        branches[i].frame = 0;
+        branches[i].runningTime = 0.0;
+        branches[i].updateTime = 1.0/16.0;
+        branches[i].pos.x = windowWidth + i * 1500;
+        branches[i].flappyCount = 0; // null for trees
+        
     }
 
 
@@ -198,8 +219,6 @@ int main ()
         
         // Gravity action
         velocity += gravity * dt;
-    
-
 
         // Button Actions - Flap
          if (IsKeyPressed(KEY_SPACE))
@@ -223,7 +242,12 @@ int main ()
             // Update the position of each tree
             trees2[i].pos.x += treeVel * dt;
         }
-
+        // Update position of Branch
+        for (int i = 0; i < sizeOfBranch; i++)
+        {
+            // Update the position of each tree
+            branches[i].pos.x += treeVel * dt;
+        }
 
         // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
         // we update the frame but also restart the timer eventually. 
@@ -244,7 +268,7 @@ int main ()
             // Draw each tree
             DrawTextureRec(tree1, trees1[i].rec, trees1[i].pos, WHITE);
         }
-        // Draw all trees2 - using the same function as Flappy
+        // Draw all trees2 
         for (int i = 0; i < sizeOfTree2; i++)
         {
            trees2[i] = updateAnimData (trees2[i], dt, 4); 
@@ -252,13 +276,14 @@ int main ()
             // Draw each tree
             DrawTextureRec(tree2, trees2[i].rec, trees2[i].pos, WHITE);
         }
-        
-        
-        
-        
-        
-        
-        // Need to draw other trees and then the branches, I need to randomize more
+        // Draw all branches
+        for (int i = 0; i < sizeOfBranch; i++)
+        {
+           branches[i] = updateAnimData (branches[i], dt, 4); 
+           
+            // Draw each branch
+            DrawTextureRec(branch, branches[i].rec, branches[i].pos, WHITE);
+        }      
         
         
         
