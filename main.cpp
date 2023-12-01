@@ -199,11 +199,11 @@ int main ()
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
     // Need to setup flap 
-    const int flapVel{-600}; // (Pixels/s)/s    
+    const int flapVel{-700}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    const int gravity {800}; // (pixels/s)/s
+    const int gravity {500}; // (pixels/s)/s
 
 
     // Background image loading
@@ -214,13 +214,6 @@ int main ()
     float mgX{};
     Texture2D foreground = LoadTexture("Textures/parallax-forest-front-trees.png");
     float fgX{};
-
-    // Set bools for collisions
-    bool collisionTree = false;
-    bool collisionFlappyB = false;
-    bool collisionFlappyG = false;
-    bool collisionFlappyY = false;
-
 
     // Set this to finish the game when touching the ground or an obstacle
     bool gameOver = false;
@@ -319,30 +312,7 @@ int main ()
             // Update the position of each tree
             branches[i].pos.x += treeVel * dt;
         }
-        // Check for collisions, it did not work to have them in one for loop
-        for (int i = 0; i < sizeOfTree1; i++)
-        {
-            if (CheckCollisionRecs(flappyData.rec, trees1[i].rec))
-            {
-                bool collisionTree = true;
-            }
-            
-        }
-        for (int i = 0; i < sizeOfTree2; i++)
-        {
-            if (CheckCollisionRecs(flappyData.rec, trees2[i].rec))
-            {
-                bool collisionTree = true;
-            }
-        }
-        // Update position of Branch
-        for (int i = 0; i < sizeOfBranch; i++)
-        {
-            if (CheckCollisionRecs(flappyData.rec, trees2[i].rec))
-            {
-                bool collisionTree = true;
-            }
-        }
+
         
 
         // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
@@ -395,9 +365,88 @@ int main ()
         
         
         
+        // I needed a range base for loop
+        bool collisionTree{};
+        bool collisionFlappyB{};
+        bool collisionFlappyG{};
+        bool collisionFlappyY{};
         
+        for (AnimData tree1 : trees1) // Collision with trees1
+        {
+            float pad{50}; // Adding a pad to reduce the area of collision in the corners. 
+            Rectangle tree1Rec{ // We need to locate the tree on the screen, not on the sprite
+                tree1.pos.x + pad, 
+                tree1.pos.y + pad,
+                tree1.rec.width - 2*pad,
+                tree1.rec.height - 2*pad 
+            };
+            Rectangle flappyRec {
+                flappyData.pos.x,
+                flappyData.pos.y,
+                flappyData.rec.width,
+                flappyData.rec.height
+
+            };
+            if (CheckCollisionRecs(tree1Rec, flappyRec))
+            {
+                collisionTree = true;
+            }
+        }
+
+            for (AnimData tree2 : trees2) // Collision with trees2
+        {
+            float pad2{50}; // Adding a pad to reduce the area of collision in the corners. 
+            Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
+                tree2.pos.x + pad2, 
+                tree2.pos.y + pad2,
+                tree2.rec.width - 2*pad2,
+                tree2.rec.height - 2*pad2 
+            };
+            Rectangle flappyRec {
+                flappyData.pos.x,
+                flappyData.pos.y,
+                flappyData.rec.width,
+                flappyData.rec.height
+
+            };
+            if (CheckCollisionRecs(tree2Rec, flappyRec))
+            {
+                collisionTree = true;
+            }
+        }
+
+            for (AnimData branch : branches) // Collision with branches
+        {
+            float pad3{50}; // Adding a pad to reduce the area of collision in the corners. 
+            Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
+                branch.pos.x + pad3, 
+                branch.pos.y + pad3,
+                branch.rec.width - 2*pad3,
+                branch.rec.height - 2*pad3 
+            };
+            Rectangle flappyRec {
+                flappyData.pos.x,
+                flappyData.pos.y,
+                flappyData.rec.width,
+                flappyData.rec.height
+
+            };
+            if (CheckCollisionRecs(tree2Rec, flappyRec))
+            {
+                collisionTree = true;
+            }
+        }
+
         
+
+
+
         
+
+
+
+
+
         
         // Check for game over conditions
         if (isOnGround(flappyData, windowHeight)) {
