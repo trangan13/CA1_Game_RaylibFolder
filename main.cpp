@@ -24,7 +24,6 @@ AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
 {
 // update running time
 data.runningTime += deltaTime;
-data.rec.y = data.flappyCount * data.rec.height/4; // I think this will let me change the animation when Flappy catches children, still need to test changing flappy count
 if (data.runningTime >= data.updateTime) // check if running time has reached or exceded updateTime
 {
     data.runningTime = 0.0;
@@ -35,6 +34,8 @@ if (data.runningTime >= data.updateTime) // check if running time has reached or
     {
         data.frame = 0;
     }
+    data.rec.y = data.flappyCount * data.rec.height; // I think this will let me change the animation when Flappy catches children, still need to test changing flappy count
+
 }
 return data; // returns the data to be available outside of the function
 }
@@ -137,18 +138,6 @@ int main ()
     Texture2D flappyY = LoadTexture("textures/FlappyY.png");
      // Copied the same elements as the main flappy, only correcting the height
     int flappiesTotal {0}; // Using the same strategy as the trees to randomize
-    AnimData flappyBData;
-    flappyBData.rec.width = flappyB.width/4; 
-    flappyBData.rec.height = flappyB.height; // Updated to all small bird sprites
-    flappyBData.rec.x = 0;
-    flappyBData.rec.y = 0;
-    flappiesTotal += GetRandomValue(500,1000);
-    flappyBData.pos.x = windowWidth + flappiesTotal; // So they start outside the screen a bit randomly
-    flappyBData.pos.y = windowHeight/2 - flappyBData.rec.height; 
-    flappyBData.frame = 0; 
-    flappyBData.runningTime = 0.0;
-    flappyBData.updateTime = 1.0/24.0; // faster flapping than mom
-    flappyBData.flappyCount = 0; // 
     // Flappy G
     AnimData flappyGData;
     flappyGData.rec.width = flappyG.width/4; 
@@ -156,13 +145,27 @@ int main ()
     flappyGData.rec.x = 0;
     flappyGData.rec.y = 0;
 
-    flappiesTotal += GetRandomValue(1000,2000);
+    flappiesTotal += GetRandomValue(500,1500); // In my sprite green goes first
     flappyGData.pos.x = windowWidth + flappiesTotal;
     flappyGData.pos.y = windowHeight/2 - flappyGData.rec.height; 
     flappyGData.frame = 0; 
     flappyGData.runningTime = 0.0;
     flappyGData.updateTime = 1.0/24.0; // faster flapping than mom
     flappyGData.flappyCount = 0; // 
+     
+    AnimData flappyBData;
+    flappyBData.rec.width = flappyB.width/4; 
+    flappyBData.rec.height = flappyB.height; // Updated to all small bird sprites
+    flappyBData.rec.x = 0;
+    flappyBData.rec.y = 0;
+    flappiesTotal += GetRandomValue(1000,2500);
+    flappyBData.pos.x = windowWidth + flappiesTotal; // So they start outside the screen a bit randomly
+    flappyBData.pos.y = windowHeight/2 - flappyBData.rec.height; 
+    flappyBData.frame = 0; 
+    flappyBData.runningTime = 0.0;
+    flappyBData.updateTime = 1.0/24.0; // faster flapping than mom
+    flappyBData.flappyCount = 0; // 
+   
     // Flappy Y
      AnimData flappyYData;
     flappyYData.rec.width = flappyY.width/4; 
@@ -218,6 +221,12 @@ int main ()
     // Set this to finish the game when touching the ground or an obstacle
     bool gameOver = false;
 
+    // Setting up collision booleans for interaction with obstacles and flappies // Moving them outside the while loop
+    bool collisionTree{};
+    bool collisionFlappyB{};
+    bool collisionFlappyG{};
+    bool collisionFlappyY{};
+
     // Starting with basic setup, FPS, while loop, begin drawing
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
     SetTargetFPS(60);
@@ -270,11 +279,7 @@ int main ()
         DrawTextureEx(foreground, fg2Pos, 0.0, 5.0, WHITE);
         
 
-        // Setting up collision booleans for interaction with obstacles and flappies
-        bool collisionTree{};
-        bool collisionFlappyB{};
-        bool collisionFlappyG{};
-        bool collisionFlappyY{};
+
 
         
         // Gravity action
@@ -462,23 +467,28 @@ int main ()
         if (CheckCollisionRecs(flappyRec, flappyBRec))
             {
                 collisionFlappyB = true;
+                flappyData.flappyCount = 2; // Updating the Y position to change the sprite and show a child
             }
         if (CheckCollisionRecs(flappyRec, flappyGRec))
             {
                 collisionFlappyG = true;
+                flappyData.flappyCount = 1; // Correcting again with the position of my sprite
             }
         if (CheckCollisionRecs(flappyRec, flappyYRec))
             {
                 collisionFlappyY = true;
+                flappyData.flappyCount = 3;
             }
 
 
         // Draw Flappies // Adding a condition to collision
-        if(!collisionFlappyB){
-            DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
-        }
+
+         
         if(!collisionFlappyG){
             DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
+        }
+        if(!collisionFlappyB){
+            DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
         }
         if(!collisionFlappyY){
             DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
