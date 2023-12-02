@@ -270,9 +270,11 @@ int main ()
         DrawTextureEx(foreground, fg2Pos, 0.0, 5.0, WHITE);
         
 
-
-
-
+        // Setting up collision booleans for interaction with obstacles and flappies
+        bool collisionTree{};
+        bool collisionFlappyB{};
+        bool collisionFlappyG{};
+        bool collisionFlappyY{};
 
         
         // Gravity action
@@ -332,10 +334,8 @@ int main ()
         }
         
 
-        // Draw Flappies
-        DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
-        DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
-        DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
+
+        
        
        
         // Draw all trees1 - using the same function as Flappy
@@ -365,12 +365,6 @@ int main ()
         
         
         
-        // I needed a range base for loop
-        bool collisionTree{};
-        bool collisionFlappyB{};
-        bool collisionFlappyG{};
-        bool collisionFlappyY{};
-        
         for (AnimData tree1 : trees1) // Collision with trees1
         {
             float pad{50}; // Adding a pad to reduce the area of collision in the corners. 
@@ -393,7 +387,7 @@ int main ()
             }
         }
 
-            for (AnimData tree2 : trees2) // Collision with trees2
+        for (AnimData tree2 : trees2) // Collision with trees2
         {
             float pad2{50}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
@@ -415,7 +409,28 @@ int main ()
             }
         }
 
-            for (AnimData branch : branches) // Collision with branches
+        for (AnimData branch : branches) // Collision with branches
+        {
+            float pad3{50}; // Adding a pad to reduce the area of collision in the corners. 
+            Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
+                branch.pos.x + pad3, 
+                branch.pos.y + pad3,
+                branch.rec.width - 2*pad3,
+                branch.rec.height - 2*pad3 
+            };
+            Rectangle flappyRec {
+                flappyData.pos.x,
+                flappyData.pos.y,
+                flappyData.rec.width,
+                flappyData.rec.height
+            };
+            if (CheckCollisionRecs(tree2Rec, flappyRec))
+            {
+                collisionTree = true;
+            }
+        }
+
+        for (AnimData branch : branches) // Collision with FlappyB
         {
             float pad3{50}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
@@ -438,9 +453,36 @@ int main ()
         }
 
         
+        // Collision with Flappies, since they are not arrays I think I can just create the rectangles to check for collision
+        Rectangle flappyRec = {flappyData.pos.x, flappyData.pos.y, flappyData.rec.width, flappyData.rec.height};
+        Rectangle flappyBRec = {flappyBData.pos.x, flappyBData.pos.y, flappyBData.rec.width, flappyBData.rec.height};
+        Rectangle flappyGRec = {flappyGData.pos.x, flappyGData.pos.y, flappyGData.rec.width, flappyGData.rec.height};
+        Rectangle flappyYRec = {flappyYData.pos.x, flappyYData.pos.y, flappyYData.rec.width, flappyYData.rec.height};
+
+        if (CheckCollisionRecs(flappyRec, flappyBRec))
+            {
+                collisionFlappyB = true;
+            }
+        if (CheckCollisionRecs(flappyRec, flappyGRec))
+            {
+                collisionFlappyG = true;
+            }
+        if (CheckCollisionRecs(flappyRec, flappyYRec))
+            {
+                collisionFlappyY = true;
+            }
 
 
-
+        // Draw Flappies // Adding a condition to collision
+        if(!collisionFlappyB){
+            DrawTextureRec(flappyB, flappyBData.rec, flappyBData.pos, WHITE);
+        }
+        if(!collisionFlappyG){
+            DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
+        }
+        if(!collisionFlappyY){
+            DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
+        }
         
 
 
