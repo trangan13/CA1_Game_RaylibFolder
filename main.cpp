@@ -63,6 +63,24 @@ int main ()
     // Custom Font: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/1518ca81d2727b80735651599ee26f5905ebc22d
     Font customFont = LoadFont("fonts/blueStyle.otf");
 
+    // Audio / For background music and sprite effects: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/14e8669b1f2ca643c209f1ca952611b726b73f81
+    InitAudioDevice();
+
+    // Loading all sounds
+    /* Sound musicTense = LoadSound("Sounds/tense.wav");
+    Sound musicRelief = LoadSound("Sounds/relief.wav"); */ //Commenting out to debug, window is too slow
+    Sound soundFlap = LoadSound("Sounds/flap.wav");
+    Sound soundMama = LoadSound("Sounds/mama.wav");
+
+    // Sound settings
+    int volumeSounds = 40;
+   /* int volumeMusic = 30;
+    SetSoundVolume(musicTense, volumeMusic/100.0f);
+    SetSoundVolume(musicRelief, volumeMusic/100.0f); // Commenting out to debug, window is too slow */
+    SetSoundVolume(soundFlap, volumeSounds/100.0f);
+    SetSoundVolume(soundMama, volumeSounds/100.0f);
+
+
     // Trees on fire Obstacles variables, I have opten for 2 different trees and 1 branch
     Texture2D tree1 = LoadTexture("textures/tree1.png"); // They should be trees on fire but for now just fire
     Texture2D tree2 = LoadTexture("textures/tree2.png");
@@ -240,6 +258,7 @@ int main ()
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
     SetTargetFPS(60);
 
+
     while (!WindowShouldClose()){
         
         // Calling Delta time for future reference
@@ -295,25 +314,28 @@ int main ()
         velocity += gravity * dt;
 
         // Button Actions - Flap
-         if (IsKeyPressed(KEY_SPACE))
-        {
-            velocity += flapVel;
-        }
-        if(IsKeyDown(KEY_LEFT))
-        {
-            rvelocity -= 20;
-        } else
-        {
-            rvelocity = 0;
-        }
-        if(IsKeyDown(KEY_RIGHT))
-        {
-            lvelocity += 20;
-        } else
-        {
-            lvelocity = 0;
-        }
-
+        // I am changing the conditional for game over here for flappy to fall instead of dissapearing
+        if (!gameOver){        
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                velocity += flapVel;
+                PlaySound(soundFlap); // Adding sound effect to the flapp
+            }
+            if(IsKeyDown(KEY_LEFT))
+            {
+                rvelocity -= 20;
+            } else
+            {
+                rvelocity = 0;
+            }
+            if(IsKeyDown(KEY_RIGHT))
+            {
+                lvelocity += 20;
+            } else
+            {
+                lvelocity = 0;
+            }
+         }
 
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
@@ -359,14 +381,9 @@ int main ()
         flappyGData = updateAnimData(flappyGData, dt, 4);
         flappyYData = updateAnimData(flappyYData, dt, 4);
 
-        // Draw Flappy - Adding a gameover condition to stop drawing when we die
-        if (!gameOver){
-            DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
-        }
-        
-
-
-        
+        // Draw Flappy 
+        DrawTextureRec(flappy, flappyData.rec, flappyData.pos, WHITE);
+      
        
        
         // Draw all trees1 - using the same function as Flappy
@@ -494,24 +511,27 @@ int main ()
         if (!collisionFlappyB && CheckCollisionRecs(flappyRec, flappyBRec))
             {
                 collisionFlappyB = true;
+                PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 2; // Updating the Y position to change the sprite and show a child
-                flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
+                flapVel = flapVel - flapVel*.3; // I will reduce a percentage 10% // changed to 30% to feel the weight
                 treeVel = treeVel + treeVel *.1; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
         if (!collisionFlappyG && CheckCollisionRecs(flappyRec, flappyGRec))
             {
                 collisionFlappyG = true;
+                PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 1; // Correcting again with the position of my sprite
                  flapVel = flapVel - flapVel*.1; // I will reduce a percentage 10%
-                treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
+                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
         if (!collisionFlappyY && CheckCollisionRecs(flappyRec, flappyYRec))
             {
                 collisionFlappyY = true;
+                PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 3;
-                 flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
+                flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
                 treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
@@ -573,7 +593,14 @@ int main ()
     UnloadTexture(tree1);
     UnloadTexture(tree2);
     UnloadTexture(branch);
+    
     UnloadFont(customFont);
+
+    /* UnloadSound(musicRelief);
+    UnloadSound(musicTense); */
+    UnloadSound(soundFlap);
+    UnloadSound(soundMama);
+
 
     // Close Window and Unload Textures
     CloseWindow();
