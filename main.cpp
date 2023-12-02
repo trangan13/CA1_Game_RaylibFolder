@@ -52,7 +52,6 @@ return data; // returns the data to be available outside of the function
 
 
 
-
 int main ()
 {
    // Creating constants for the screen size
@@ -67,16 +66,19 @@ int main ()
     InitAudioDevice();
 
     // Loading all sounds
-    /* Sound musicTense = LoadSound("Sounds/tense.wav");
-    Sound musicRelief = LoadSound("Sounds/relief.wav"); */ //Commenting out to debug, window is too slow
+    Music musicTense = LoadMusicStream("Sounds/tense.wav"); // Changing them to music stream isntead of audio
+    Music musicRelief = LoadMusicStream("Sounds/relief.wav"); 
     Sound soundFlap = LoadSound("Sounds/flap.wav");
     Sound soundMama = LoadSound("Sounds/mama.wav");
 
+    // Seems I need to play music outside the while loop https://www.raylib.com/examples/audio/loader.html?name=audio_music_stream
+    PlayMusicStream(musicTense);
+
     // Sound settings
     int volumeSounds = 40;
-   /* int volumeMusic = 30;
-    SetSoundVolume(musicTense, volumeMusic/100.0f);
-    SetSoundVolume(musicRelief, volumeMusic/100.0f); // Commenting out to debug, window is too slow */
+    int volumeMusic = 30;
+    SetMusicVolume(musicTense, volumeMusic/100.0f);
+    SetMusicVolume(musicRelief, volumeMusic/100.0f); 
     SetSoundVolume(soundFlap, volumeSounds/100.0f);
     SetSoundVolume(soundMama, volumeSounds/100.0f);
 
@@ -226,7 +228,7 @@ int main ()
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
-    // Need to setup flap 
+    // Need to setup flap movement
     int flapVel{-600}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
@@ -247,6 +249,8 @@ int main ()
 
     // Set this to finish the game when touching the ground or an obstacle
     bool gameOver = false;
+    // winning the game
+    bool gameWon = false;
 
     // Setting up collision booleans for interaction with obstacles and flappies // Moving them outside the while loop
     bool collisionTree{};
@@ -259,10 +263,46 @@ int main ()
     SetTargetFPS(60);
 
 
+
+
+    while(!IsMusicStreamPlaying(musicTense) && !WindowShouldClose()){ // Ryan Bissett helped me with this condition through the Discord Channel for class
+
+
+       /* // Using the same background animation
+        Vector2 bg1Pos{bgX, 0.0};
+        DrawTextureEx(background, bg1Pos, 0.0, 5.0, WHITE);
+        Vector2 bg2Pos{bgX + background.width*5, 0.0}; // this duplicates the background, *5 because that is the lenght of the scaled texture
+        DrawTextureEx(background, bg2Pos, 0.0, 5.0, WHITE);
+
+        Vector2 mg1Pos{mgX, 0.0};
+        DrawTextureEx(midground, mg1Pos, 0.0, 5.0, WHITE);
+        Vector2 mg2Pos{mgX + midground.width*5, 0.0}; // this duplicates the midground
+        DrawTextureEx(midground, mg2Pos, 0.0, 5.0, WHITE);
+
+        Vector2 fg1Pos{fgX, 0.0};
+        DrawTextureEx(foreground, fg1Pos, 0.0, 5.0, WHITE);
+        Vector2 fg2Pos{fgX + foreground.width*5, 0.0}; // this duplicates the midground
+        DrawTextureEx(foreground, fg2Pos, 0.0, 5.0, WHITE); */
+
+        DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-353, windowHeight/2-49}, 100, 3, BLACK); 
+        DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
+        
+    }
     while (!WindowShouldClose()){
         
         // Calling Delta time for future reference
         float dt{GetFrameTime()};
+
+        UpdateMusicStream(musicTense);   // Update music buffer with new stream data
+        UpdateMusicStream(musicRelief);
+        if(!gameWon){         // Setting up background music, using a condition for when winning the game
+            
+        } else {
+        StopMusicStream(musicTense);
+        PlayMusicStream(musicRelief);
+        }
+
+        
 
 
         // Begin Drawing
@@ -596,11 +636,12 @@ int main ()
     
     UnloadFont(customFont);
 
-    /* UnloadSound(musicRelief);
-    UnloadSound(musicTense); */
+    UnloadMusicStream(musicRelief);
+    UnloadMusicStream(musicTense); 
     UnloadSound(soundFlap);
     UnloadSound(soundMama);
 
+    CloseAudioDevice;
 
     // Close Window and Unload Textures
     CloseWindow();
