@@ -97,10 +97,10 @@ int main ()
     InitAudioDevice();
 
     // Loading all sounds
-    Music musicTense = LoadMusicStream("Sounds/tense.wav"); // Changing them to music stream isntead of audio
-    Music musicRelief = LoadMusicStream("Sounds/relief.wav"); 
-    Sound soundFlap = LoadSound("Sounds/flap.wav");
-    Sound soundMama = LoadSound("Sounds/mama.wav");
+    Music musicTense = LoadMusicStream("Sounds/Audiio_NicolasGurrero_OrchestralWorks_TheAntechamber.wav"); // Changing them to music stream isntead of audio
+    Music musicRelief = LoadMusicStream("Sounds/Audiio_Ghosthood_SideEffects_SideEffects_Inst.wav"); 
+    Sound soundFlap = LoadSound("sounds/flap.wav");
+    Sound soundMama = LoadSound("sounds/mama.wav");
 
     // Seems I need to play music outside the while loop https://www.raylib.com/examples/audio/loader.html?name=audio_music_stream
     PlayMusicStream(musicTense);
@@ -265,7 +265,6 @@ int main ()
     int flapVel{-600}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
-    int sidevelocity {0};
      // Gravity
     int gravity {500}; // (pixels/s)/s
 
@@ -302,8 +301,6 @@ int main ()
     StartTimer(&loadTimer, loadLife); // timer should start outside the loop
     StartTimer (&messageTimer, messageLife);
 
-    // Game winning timer
-    Timer gameWonTimer = {0};
     
     // This condition loop was not working when checking for the music to be ready, used the timer only instead
     while(!WindowShouldClose() && !TimerDone(&loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
@@ -327,7 +324,7 @@ int main ()
         EndDrawing();
         
     } 
-    while (!WindowShouldClose()){
+      while (!WindowShouldClose()){
         
         // Calling Delta time for future reference
         float dt{GetFrameTime()};
@@ -335,7 +332,8 @@ int main ()
         UpdateMusicStream(musicTense);   // Update music buffer with new stream data
         UpdateMusicStream(musicRelief);
 
-        
+    
+
         // Begin Drawing
         BeginDrawing();
         ClearBackground(WHITE);
@@ -386,26 +384,16 @@ int main ()
 
         // Button Actions - Flap
         // I am changing the conditional for game over here for flappy to fall instead of dissapearing
-        if (!gameOver && !gameWon){        
+        if (!gameOver){        
             if (IsKeyPressed(KEY_SPACE))
             {
                 velocity += flapVel;
                 PlaySound(soundFlap); // Adding sound effect to the flapp
-            } else { // Stopping animation when flapping, putting the code together now. 
-            flappyData = updateAnimData (flappyData, dt, 4); 
-        
-           }
+            }
+         }
 
-        // Other actions related to flappy movement and animation for when the game is lost or won
-        if(gameOver){
-            velocity = 500; // Making Flappy fall quickly when dead
-            flappyData.updateTime = 1.0/36.0; // Changing animation when dropping
-         } 
-
-   
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
-        flappyData.pos.x += sidevelocity * dt; // simplified to one variable, my game was chrasing in laptop
 
         // Update position of flappies
         flappyBData.pos.x += flappiesVel * dt;
@@ -433,7 +421,15 @@ int main ()
             branches[i].pos.x += treeVel * dt;
         }
 
+        
 
+        // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
+        // we update the frame but also restart the timer eventually. 
+        // Original code stops animation when in the air, I will do the same if space bar is pressed. 
+       if(!IsKeyPressed(KEY_SPACE))
+       { 
+            flappyData = updateAnimData (flappyData, dt, 4);
+       }
         flappyBData = updateAnimData(flappyBData, dt, 4);
         flappyGData = updateAnimData(flappyGData, dt, 4);
         flappyYData = updateAnimData(flappyYData, dt, 4);
@@ -580,7 +576,7 @@ int main ()
                 PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 1; // Correcting again with the position of my sprite
                  flapVel = flapVel - flapVel*.1; // I will reduce a percentage 10%
-                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles 30%
+                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
         if (!collisionFlappyY && CheckCollisionRecs(flappyRec, flappyYRec))
@@ -592,39 +588,11 @@ int main ()
                 treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
-        /*
-        // setting up timer for when catching last flappy, there wil be a message at 5 seconds and the game 
-        // will be won at 10 seconds. 
-        if (collisionFlappyY && gameWonTimer.Lifetime == 0) { // using two conditions so it does not start over
-            StartTimer(&gameWonTimer, 10.0f); 
-        }
-
-        if (gameWonTimer.Lifetime > 0) {
-            UpdateTimer(&gameWonTimer);
-
-            // After 5 seconds show message
-        if (gameWonTimer.Lifetime <= 5) {
-            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/2.0f-48}, 60, 3, BLACK); // making the floats to prevent a vector error
-            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/2.0f-50},  60, 3, YELLOW);          
-        }
-        if (gameWonTimer.Lifetime <= 0) {
-                gameWon = true;
-        }
-        }
-
-
-        if (gameWon) {
-            velocity = 0; // Nice flight, no more keyboard movements
-            gravity = 0; // No more falling
-            StopMusicStream(musicTense);
-            PlayMusicStream(musicRelief); // Change of music
-        }
-        */
-
-
 
 
         // Draw Flappies // Adding a condition to collision
+
+         
         if(!collisionFlappyG){
             DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
         }
@@ -634,7 +602,11 @@ int main ()
         if(!collisionFlappyY){
             DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
         }
-    
+        
+
+
+
+
 
         
         // Check for game over conditions - Added losing a Flappy and unified any tree collision
@@ -686,5 +658,8 @@ int main ()
 
     // Close Window and Unload Textures
     CloseWindow();
-    }
+
+
+
+
 }
