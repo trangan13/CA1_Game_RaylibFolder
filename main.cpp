@@ -85,9 +85,9 @@ bool TimerDone(Timer* timer)
 
 int main ()
 {
-   // Creating constants for the screen size
-    const int windowWidth {1360}; // Reduce dimensions that match background ratio
-    const int windowHeight {800};
+   // Creating constants for the screen size // changing out of constants so I can clear them out when winning
+    float windowWidth {1360.0f}; // Reduce dimensions that match background ratio
+    float windowHeight {800.0f};
     InitWindow( windowWidth, windowHeight, "All my flappys");
 
     // Custom Font: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/1518ca81d2727b80735651599ee26f5905ebc22d
@@ -128,6 +128,9 @@ int main ()
     // Array of tree1
     AnimData trees1[sizeOfTree1]{};
 
+    // Variable to clear obstacles when winning the game
+    float clearing = 0.0;
+
     // Random value did not work very well for the logic, as multiplying by i makes distances longer everytime, I need to generate a value and add it to a variable
     // https://community.gamedev.tv/t/can-i-improve-dapper-dasher-how/206459/6 
     int trees1Total {0};
@@ -138,7 +141,7 @@ int main ()
         trees1[i].rec.y = 0.0;
         trees1[i].rec.width = tree1.width/4;
         trees1[i].rec.height = tree1.height;
-        trees1[i].pos.y = windowHeight - tree1.height; // Trees appear at ground level
+        trees1[i].pos.y = windowHeight - tree1.height + clearing; // Trees appear at ground level
         trees1[i].frame = 0;
         trees1[i].runningTime = 0.0;
         trees1[i].updateTime = 1.0/16.0;
@@ -158,7 +161,7 @@ int main ()
         trees2[i].rec.y = 0.0;
         trees2[i].rec.width = tree2.width/4;
         trees2[i].rec.height = tree2.height;
-        trees2[i].pos.y = windowHeight - tree2.height; // Trees appear at ground level
+        trees2[i].pos.y = windowHeight - tree2.height += clearing; // Trees appear at ground level
         trees2[i].frame = 0;
         trees2[i].runningTime = 0.0;
         trees2[i].updateTime = 1.0/16.0;
@@ -178,7 +181,7 @@ int main ()
         branches[i].rec.y = 0.0;
         branches[i].rec.width = branch.width/4;
         branches[i].rec.height = branch.height;
-        branches[i].pos.y = 0; // Branches appear at the top right
+        branches[i].pos.y -= clearing; // Branches appear at the top right // clearing needs to be negative
         branches[i].frame = 0;
         branches[i].runningTime = 0.0;
         branches[i].updateTime = 1.0/16.0;
@@ -260,12 +263,12 @@ int main ()
     flappyData.updateTime = 1.0/12.0; // how often a frame is changed
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
+
     // Need to setup flap movement
     int flapVel{-600}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
-    int rvelocity {0};
-    int lvelocity {0};
+    int sidevelocity {0};
      // Gravity
     int gravity {500}; // (pixels/s)/s
 
@@ -294,10 +297,16 @@ int main ()
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
     SetTargetFPS(60);
 
-    // My timer
-    float loadLife = 5.0f;
+    // My timer for loading
+    float loadLife = 10.0f;
+    float messageLife = 5.0f;
     Timer loadTimer = {0};
+    Timer messageTimer = {0};
     StartTimer(&loadTimer, loadLife); // timer should start outside the loop
+    StartTimer (&messageTimer, messageLife);
+
+    // Game winning timer
+    Timer gameWonTimer = {0};
     
     // This condition loop was not working when checking for the music to be ready, used the timer only instead
     while(!WindowShouldClose() && !TimerDone(&loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
@@ -305,10 +314,18 @@ int main ()
         // Begin Drawing
         BeginDrawing();
         ClearBackground(WHITE);
-        DrawTextureEx(background, (Vector2){0, 0}, 0.0, 5.0, WHITE);
-        DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-353, windowHeight/2-49}, 100, 3, BLACK); 
-        DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
         UpdateTimer (&loadTimer);
+        UpdateTimer(&messageTimer);
+        DrawTextureEx(background, (Vector2){0, 0}, 0.0, 5.0, WHITE);
+
+        if (!TimerDone(&messageTimer)){
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-354, windowHeight/2-48}, 100, 3, BLACK); 
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
+        } else {
+            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-354, windowHeight/2-48}, 120, 4, BLACK); 
+            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-350, windowHeight/2-50},  120, 4, RED);
+            
+        }
 
         EndDrawing();
         
@@ -320,16 +337,8 @@ int main ()
 
         UpdateMusicStream(musicTense);   // Update music buffer with new stream data
         UpdateMusicStream(musicRelief);
-        if(!gameWon){         // Setting up background music, using a condition for when winning the game
-            
-        } else {
-        StopMusicStream(musicTense);
-        PlayMusicStream(musicRelief);
-        }
 
         
-
-
         // Begin Drawing
         BeginDrawing();
         ClearBackground(WHITE);
@@ -380,32 +389,26 @@ int main ()
 
         // Button Actions - Flap
         // I am changing the conditional for game over here for flappy to fall instead of dissapearing
-        if (!gameOver){        
+        if (!gameOver && !gameWon){        
             if (IsKeyPressed(KEY_SPACE))
             {
                 velocity += flapVel;
                 PlaySound(soundFlap); // Adding sound effect to the flapp
-            }
-            if(IsKeyDown(KEY_LEFT))
-            {
-                rvelocity -= 20;
-            } else
-            {
-                rvelocity = 0;
-            }
-            if(IsKeyDown(KEY_RIGHT))
-            {
-                lvelocity += 20;
-            } else
-            {
-                lvelocity = 0;
-            }
-         }
+            } else { // Stopping animation when flapping, putting the code together now. 
+            flappyData = updateAnimData (flappyData, dt, 4); 
+        
+           }
 
+        // Other actions related to flappy movement and animation for when the game is lost or won
+        if(gameOver){
+            velocity = 500; // Making Flappy fall quickly when dead
+            flappyData.updateTime = 1.0/36.0; // Changing animation when dropping
+         } 
+
+   
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
-        flappyData.pos.x += rvelocity * dt;
-        flappyData.pos.x += lvelocity * dt;
+        flappyData.pos.x += sidevelocity * dt; // simplified to one variable, my game was chrasing in laptop
 
         // Update position of flappies
         flappyBData.pos.x += flappiesVel * dt;
@@ -433,15 +436,7 @@ int main ()
             branches[i].pos.x += treeVel * dt;
         }
 
-        
 
-        // Update Runnning Time - This works as a timer, everytime running time reaches 12th of a second, 
-        // we update the frame but also restart the timer eventually. 
-        // Original code stops animation when in the air, I will do the same if space bar is pressed. 
-       if(!IsKeyPressed(KEY_SPACE))
-       { 
-            flappyData = updateAnimData (flappyData, dt, 4);
-       }
         flappyBData = updateAnimData(flappyBData, dt, 4);
         flappyGData = updateAnimData(flappyGData, dt, 4);
         flappyYData = updateAnimData(flappyYData, dt, 4);
@@ -588,7 +583,7 @@ int main ()
                 PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 1; // Correcting again with the position of my sprite
                  flapVel = flapVel - flapVel*.1; // I will reduce a percentage 10%
-                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles
+                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles 30%
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
         if (!collisionFlappyY && CheckCollisionRecs(flappyRec, flappyYRec))
@@ -601,10 +596,42 @@ int main ()
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
 
+        // setting up timer for when catching last flappy, there wil be a message at 5 seconds and the game 
+        // will be won at 10 seconds. 
+        if (collisionFlappyY && gameWonTimer.Lifetime == 0) { // using two conditions so it does not start over
+            StartTimer(&gameWonTimer, 10.0f); 
+        }
+
+        if (gameWonTimer.Lifetime > 0) {
+            UpdateTimer(&gameWonTimer);
+
+            // After 5 seconds show message
+        if (gameWonTimer.Lifetime <= 5) {
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/2.0-48}, 60, 3, BLACK); // making the floats to prevent a vector error
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/2.0-50},  60, 3, YELLOW);          
+        }
+        if (gameWonTimer.Lifetime <= 0) {
+                gameWon = true;
+        }
+        }
+
+
+        if (gameWon) {
+            velocity = 0; // Nice flight, no more keyboard movements
+            gravity = 0; // No more falling
+            StopMusicStream(musicTense);
+            PlayMusicStream(musicRelief); // Change of music
+
+            // I want all obstacles to clear
+            clearing += 0.1; // Will test this out, as it is affecting all obstacles I don't want them to dissapear instantly
+
+        }
+
+
+
+
 
         // Draw Flappies // Adding a condition to collision
-
-         
         if(!collisionFlappyG){
             DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
         }
