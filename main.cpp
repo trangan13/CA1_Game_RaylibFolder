@@ -55,12 +55,13 @@ return data; // returns the data to be available outside of the function
 
 int main ()
 {
-   /* Creating constants for the screen size
-    * I am opting for the size of a full screen
-    * as the game should be played on a phone horizontally */
-    const int windowWidth {1360}; // Reduce dimensions that match background ration
+   // Creating constants for the screen size
+    const int windowWidth {1360}; // Reduce dimensions that match background ratio
     const int windowHeight {800};
     InitWindow( windowWidth, windowHeight, "All my flappys");
+
+    // Custom Font: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/1518ca81d2727b80735651599ee26f5905ebc22d
+    Font customFont = LoadFont("fonts/blueStyle.otf");
 
     // Trees on fire Obstacles variables, I have opten for 2 different trees and 1 branch
     Texture2D tree1 = LoadTexture("textures/tree1.png"); // They should be trees on fire but for now just fire
@@ -549,10 +550,10 @@ int main ()
             gameOver = true;
         }
 
-
+        // Changed to DrawTextEx for custom font
         if (gameOver) {
-     DrawText("Who will save your flappys now", windowWidth/2-352, windowHeight/2-48,  50, BLACK); // Added a second one for visibility
-     DrawText("Who will save your flappys now", windowWidth/2-350, windowHeight/2-50,  50, RED);
+     DrawTextEx(customFont, "Who will save your flappys now", (Vector2){windowWidth/2-353, windowHeight/2-49}, 55, 3, BLACK); // Added a second one for visibility
+     DrawTextEx(customFont, "Who will save your flappys now", (Vector2){windowWidth/2-350, windowHeight/2-50},  55, 3, RED);
         }
 
 
@@ -572,6 +573,7 @@ int main ()
     UnloadTexture(tree1);
     UnloadTexture(tree2);
     UnloadTexture(branch);
+    UnloadFont(customFont);
 
     // Close Window and Unload Textures
     CloseWindow();
