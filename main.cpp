@@ -49,27 +49,35 @@ return data; // returns the data to be available outside of the function
 
 // Define Timer https://github.com/raysan5/raylib/wiki/Frequently-Asked-Questions#how-do-i-make-a-timer 
 // https://youtube.com/watch?v=vGlvTWUctTQ 
-    typedef struct Timer {
-    double startTime;   // Start time (seconds)
-    double lifeTime;    // Lifetime (seconds)
-    } Timer;
+// define a timer: other timer: https://github.com/raylib-extras/examples-c/discussions/2
+typedef struct
+{
+    float Lifetime;
+}Timer;
 
-    // start or restart a timer with specific lifetime
-    void StartTimer(Timer* timer, float lifetime)
-    {
-        timer->startTime = GetTime();
-        timer->lifeTime = lifetime;
-    }
+// start or restart a timer with a specific lifetime
+void StartTimer(Timer* timer, float lifetime)
+{
+    if (timer != nullptr)
+        timer->Lifetime = lifetime;
+}
 
-    bool TimerDone(Timer timer)
-    {
-        return GetTime() - timer.startTime >= timer.lifeTime;
-    }
+// update a timer with the current frame time
+void UpdateTimer(Timer* timer)
+{
+    // subtract this frame from the timer if it's not allready expired
+    if (timer != nullptr && timer->Lifetime > 0)
+        timer->Lifetime -= GetFrameTime();
+}
 
-    double GetElapsed(Timer timer)
-    {
-        return GetTime() - timer.startTime;
-    }
+// check if a timer is done.
+bool TimerDone(Timer* timer)
+{
+    if (timer != nullptr)
+        return timer->Lifetime <= 0;
+
+	return false;
+}
 
 
 
@@ -287,16 +295,22 @@ int main ()
     SetTargetFPS(60);
 
     // My timer
-    Timer loadTimer;
-    StartTimer (&loadTimer, 1000.0);
+    float loadLife = 5.0f;
+    Timer loadTimer = {0};
+    StartTimer(&loadTimer, loadLife); // timer should start outside the loop
     
+    // This condition loop was not working when checking for the music to be ready, used the timer only instead
+    while(!WindowShouldClose() && !TimerDone(&loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
 
-    while(!IsMusicStreamPlaying(musicTense) && !WindowShouldClose() && !TimerDone(loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
-
-        StartTimer (&loadTimer, )
+        // Begin Drawing
+        BeginDrawing();
+        ClearBackground(WHITE);
+        DrawTextureEx(background, (Vector2){0, 0}, 0.0, 5.0, WHITE);
         DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-353, windowHeight/2-49}, 100, 3, BLACK); 
         DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
-        
+        UpdateTimer (&loadTimer);
+
+        EndDrawing();
         
     } 
     while (!WindowShouldClose()){
