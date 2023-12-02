@@ -128,9 +128,6 @@ int main ()
     // Array of tree1
     AnimData trees1[sizeOfTree1]{};
 
-    // Variable to clear obstacles when winning the game
-    float clearing = 0.0;
-
     // Random value did not work very well for the logic, as multiplying by i makes distances longer everytime, I need to generate a value and add it to a variable
     // https://community.gamedev.tv/t/can-i-improve-dapper-dasher-how/206459/6 
     int trees1Total {0};
@@ -141,7 +138,7 @@ int main ()
         trees1[i].rec.y = 0.0;
         trees1[i].rec.width = tree1.width/4;
         trees1[i].rec.height = tree1.height;
-        trees1[i].pos.y = windowHeight - tree1.height + clearing; // Trees appear at ground level
+        trees1[i].pos.y = windowHeight - tree1.height; // Trees appear at ground level
         trees1[i].frame = 0;
         trees1[i].runningTime = 0.0;
         trees1[i].updateTime = 1.0/16.0;
@@ -161,7 +158,7 @@ int main ()
         trees2[i].rec.y = 0.0;
         trees2[i].rec.width = tree2.width/4;
         trees2[i].rec.height = tree2.height;
-        trees2[i].pos.y = windowHeight - tree2.height += clearing; // Trees appear at ground level
+        trees2[i].pos.y = windowHeight - tree2.height; // Trees appear at ground level
         trees2[i].frame = 0;
         trees2[i].runningTime = 0.0;
         trees2[i].updateTime = 1.0/16.0;
@@ -181,7 +178,7 @@ int main ()
         branches[i].rec.y = 0.0;
         branches[i].rec.width = branch.width/4;
         branches[i].rec.height = branch.height;
-        branches[i].pos.y -= clearing; // Branches appear at the top right // clearing needs to be negative
+        branches[i].pos.y = 0; // Branches appear at the top right // 
         branches[i].frame = 0;
         branches[i].runningTime = 0.0;
         branches[i].updateTime = 1.0/16.0;
@@ -607,8 +604,8 @@ int main ()
 
             // After 5 seconds show message
         if (gameWonTimer.Lifetime <= 5) {
-            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/2.0-48}, 60, 3, BLACK); // making the floats to prevent a vector error
-            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/2.0-50},  60, 3, YELLOW);          
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/2.0f-48}, 60, 3, BLACK); // making the floats to prevent a vector error
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/2.0f-50},  60, 3, YELLOW);          
         }
         if (gameWonTimer.Lifetime <= 0) {
                 gameWon = true;
@@ -622,9 +619,9 @@ int main ()
             StopMusicStream(musicTense);
             PlayMusicStream(musicRelief); // Change of music
 
-            // I want all obstacles to clear
+            /* I want all obstacles to clear
             clearing += 0.1; // Will test this out, as it is affecting all obstacles I don't want them to dissapear instantly
-
+            Commenting out, it seems I cannot assign this value to the animation*/ 
         }
 
 
@@ -641,11 +638,7 @@ int main ()
         if(!collisionFlappyY){
             DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
         }
-        
-
-
-
-
+    
 
         
         // Check for game over conditions - Added losing a Flappy and unified any tree collision
@@ -693,12 +686,9 @@ int main ()
     UnloadSound(soundFlap);
     UnloadSound(soundMama);
 
-    CloseAudioDevice;
+    CloseAudioDevice();
 
     // Close Window and Unload Textures
     CloseWindow();
-
-
-
-
+    }
 }
