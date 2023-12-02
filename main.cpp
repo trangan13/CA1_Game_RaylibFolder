@@ -151,7 +151,7 @@ int main ()
     flappyGData.rec.x = 0;
     flappyGData.rec.y = 0;
 
-    flappiesTotal += GetRandomValue(500,1500); // In my sprite green goes first
+    flappiesTotal += GetRandomValue(1000,2000); // In my sprite green goes first
     flappyGData.pos.x = windowWidth + flappiesTotal;
     flappyGData.pos.y = windowHeight/2 - flappyGData.rec.height; 
     flappyGData.frame = 0; 
@@ -164,7 +164,7 @@ int main ()
     flappyBData.rec.height = flappyB.height; // Updated to all small bird sprites
     flappyBData.rec.x = 0;
     flappyBData.rec.y = 0;
-    flappiesTotal += GetRandomValue(1000,2500);
+    flappiesTotal += GetRandomValue(1500,2500);
     flappyBData.pos.x = windowWidth + flappiesTotal; // So they start outside the screen a bit randomly
     flappyBData.pos.y = windowHeight/2 - flappyBData.rec.height; 
     flappyBData.frame = 0; 
@@ -179,7 +179,7 @@ int main ()
     flappyYData.rec.x = 0;
     flappyYData.rec.y = 0;
     
-    flappiesTotal += GetRandomValue(1000,2000);
+    flappiesTotal += GetRandomValue(2000,3000);
     flappyYData.pos.x = windowWidth + flappiesTotal; 
     flappyYData.pos.y = windowHeight/2 - flappyYData.rec.height; 
     flappyYData.frame = 0; 
@@ -208,11 +208,13 @@ int main ()
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
 
     // Need to setup flap 
-    const int flapVel{-700}; // (Pixels/s)/s    
+    int flapVel{-600}; // (Pixels/s)/s    
     // Set initial Velocity
     int velocity {0}; //pixels/frame
+    int rvelocity {0};
+    int lvelocity {0};
      // Gravity
-    const int gravity {500}; // (pixels/s)/s
+    int gravity {500}; // (pixels/s)/s
 
 
     // Background image loading
@@ -296,10 +298,27 @@ int main ()
         {
             velocity += flapVel;
         }
+        if(IsKeyDown(KEY_LEFT))
+        {
+            rvelocity -= 20;
+        } else
+        {
+            rvelocity = 0;
+        }
+        if(IsKeyDown(KEY_RIGHT))
+        {
+            lvelocity += 20;
+        } else
+        {
+            lvelocity = 0;
+        }
 
 
         // Update the position of Flappy, I see my current code had called in Delta Time before and assigned to dt.
         flappyData.pos.y += velocity * dt;
+        flappyData.pos.x += rvelocity * dt;
+        flappyData.pos.x += lvelocity * dt;
+
         // Update position of flappies
         flappyBData.pos.x += flappiesVel * dt;
         flappyGData.pos.x += flappiesVel * dt;
@@ -378,7 +397,7 @@ int main ()
         
         for (AnimData tree1 : trees1) // Collision with trees1
         {
-            float pad{50}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad{80}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree1Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree1.pos.x + pad, 
                 tree1.pos.y + pad,
@@ -400,7 +419,7 @@ int main ()
 
         for (AnimData tree2 : trees2) // Collision with trees2
         {
-            float pad2{50}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad2{150}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree2.pos.x + pad2, 
                 tree2.pos.y + pad2,
@@ -422,7 +441,7 @@ int main ()
 
         for (AnimData branch : branches) // Collision with branches
         {
-            float pad3{50}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad3{80}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 branch.pos.x + pad3, 
                 branch.pos.y + pad3,
@@ -470,20 +489,30 @@ int main ()
         Rectangle flappyGRec = {flappyGData.pos.x, flappyGData.pos.y, flappyGData.rec.width, flappyGData.rec.height};
         Rectangle flappyYRec = {flappyYData.pos.x, flappyYData.pos.y, flappyYData.rec.width, flappyYData.rec.height};
 
-        if (CheckCollisionRecs(flappyRec, flappyBRec))
+        // Added another conditional as the changes were being looped and going crazy
+        if (!collisionFlappyB && CheckCollisionRecs(flappyRec, flappyBRec))
             {
                 collisionFlappyB = true;
                 flappyData.flappyCount = 2; // Updating the Y position to change the sprite and show a child
+                flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
+                treeVel = treeVel + treeVel *.1; // increase velocity of obstacles
+                flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
-        if (CheckCollisionRecs(flappyRec, flappyGRec))
+        if (!collisionFlappyG && CheckCollisionRecs(flappyRec, flappyGRec))
             {
                 collisionFlappyG = true;
                 flappyData.flappyCount = 1; // Correcting again with the position of my sprite
+                 flapVel = flapVel - flapVel*.1; // I will reduce a percentage 10%
+                treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
+                flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
-        if (CheckCollisionRecs(flappyRec, flappyYRec))
+        if (!collisionFlappyY && CheckCollisionRecs(flappyRec, flappyYRec))
             {
                 collisionFlappyY = true;
                 flappyData.flappyCount = 3;
+                 flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
+                treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
+                flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
 
 
@@ -507,13 +536,19 @@ int main ()
 
         
         // Check for game over conditions - Added losing a Flappy and unified any tree collision
-        if (isOnGround(flappyData, windowHeight) 
-        or isLost(flappyBData, windowWidth) 
-        or isLost(flappyGData, windowWidth) 
-        or isLost(flappyYData, windowWidth)
-        or collisionTree) {
+        if (isOnGround(flappyData, windowHeight) or collisionTree) {
+            gameOver = true;
+        } else if (!collisionFlappyB and isLost(flappyBData, windowWidth)) // Updated the conditions only to check if we don't rescue them first
+        {
+            gameOver = true;
+        } else if (!collisionFlappyG and isLost(flappyGData, windowWidth))
+        {
+            gameOver = true;
+        } else if (!collisionFlappyY and isLost(flappyYData, windowWidth))
+        {
             gameOver = true;
         }
+
 
         if (gameOver) {
      DrawText("Who will save your flappys now", windowWidth/2-352, windowHeight/2-48,  50, BLACK); // Added a second one for visibility
