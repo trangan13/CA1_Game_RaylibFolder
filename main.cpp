@@ -47,6 +47,29 @@ return data; // returns the data to be available outside of the function
 }
 
 
+// Define Timer https://github.com/raysan5/raylib/wiki/Frequently-Asked-Questions#how-do-i-make-a-timer 
+// https://youtube.com/watch?v=vGlvTWUctTQ 
+    typedef struct Timer {
+    double startTime;   // Start time (seconds)
+    double lifeTime;    // Lifetime (seconds)
+    } Timer;
+
+    // start or restart a timer with specific lifetime
+    void StartTimer(Timer* timer, float lifetime)
+    {
+        timer->startTime = GetTime();
+        timer->lifeTime = lifetime;
+    }
+
+    bool TimerDone(Timer timer)
+    {
+        return GetTime() - timer.startTime >= timer.lifeTime;
+    }
+
+    double GetElapsed(Timer timer)
+    {
+        return GetTime() - timer.startTime;
+    }
 
 
 
@@ -73,6 +96,7 @@ int main ()
 
     // Seems I need to play music outside the while loop https://www.raylib.com/examples/audio/loader.html?name=audio_music_stream
     PlayMusicStream(musicTense);
+    PauseMusicStream(musicRelief); // Might need to leave it paused to be ready
 
     // Sound settings
     int volumeSounds = 40;
@@ -262,32 +286,19 @@ int main ()
     // Code from: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/9fef4e7cde904d2a6832a49adcba3959b9cd7a95
     SetTargetFPS(60);
 
+    // My timer
+    Timer loadTimer;
+    StartTimer (&loadTimer, 1000.0);
+    
 
+    while(!IsMusicStreamPlaying(musicTense) && !WindowShouldClose() && !TimerDone(loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
 
-
-    while(!IsMusicStreamPlaying(musicTense) && !WindowShouldClose()){ // Ryan Bissett helped me with this condition through the Discord Channel for class
-
-
-       /* // Using the same background animation
-        Vector2 bg1Pos{bgX, 0.0};
-        DrawTextureEx(background, bg1Pos, 0.0, 5.0, WHITE);
-        Vector2 bg2Pos{bgX + background.width*5, 0.0}; // this duplicates the background, *5 because that is the lenght of the scaled texture
-        DrawTextureEx(background, bg2Pos, 0.0, 5.0, WHITE);
-
-        Vector2 mg1Pos{mgX, 0.0};
-        DrawTextureEx(midground, mg1Pos, 0.0, 5.0, WHITE);
-        Vector2 mg2Pos{mgX + midground.width*5, 0.0}; // this duplicates the midground
-        DrawTextureEx(midground, mg2Pos, 0.0, 5.0, WHITE);
-
-        Vector2 fg1Pos{fgX, 0.0};
-        DrawTextureEx(foreground, fg1Pos, 0.0, 5.0, WHITE);
-        Vector2 fg2Pos{fgX + foreground.width*5, 0.0}; // this duplicates the midground
-        DrawTextureEx(foreground, fg2Pos, 0.0, 5.0, WHITE); */
-
+        StartTimer (&loadTimer, )
         DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-353, windowHeight/2-49}, 100, 3, BLACK); 
         DrawTextEx(customFont, "Loading...", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
         
-    }
+        
+    } 
     while (!WindowShouldClose()){
         
         // Calling Delta time for future reference
