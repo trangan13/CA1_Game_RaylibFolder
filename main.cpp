@@ -12,10 +12,16 @@ struct AnimData
     int flappyCount; // Adding this to be able to change the animation on the y axis
 };
 
-// This is to check if the character touches the ground - I might add aswell if crosses the sky limit
+// This is to check if the character touches the ground 
 bool isOnGround(AnimData data, int windowHeight)
 {
     return data.pos.y >= windowHeight - data.rec.height;
+}
+
+// Creating another function to check when flappies are off screen (lost)
+bool isLost(AnimData data, int windowWidth)
+{
+    return data.pos.x <= windowWidth*0;
 }
 
 
@@ -183,7 +189,7 @@ int main ()
     
     
     // Flappies movement animation
-    int flappiesVel {-120};
+    int flappiesVel {-150};
 
 
 
@@ -242,19 +248,19 @@ int main ()
         ClearBackground(WHITE);
 
         // Movement for the background, conditional to bring it back again. 
-        bgX -= 20 * dt;
+        bgX -= 50 * dt;
         if (bgX <= -background.width*5)
         {
             bgX = 0;
         }
 
-        mgX -= 50 * dt; // Same for midground
+        mgX -= 100 * dt; // Same for midground
         if (mgX <= -midground.width*5)
         {
             mgX = 0;
         }
         
-        fgX -= 100 * dt; // Same for background
+        fgX -= 160 * dt; // Same for background
         if (fgX <= -foreground.width*5)
         {
             fgX = 0;
@@ -500,11 +506,12 @@ int main ()
 
 
         
-        // Check for game over conditions
-        if (isOnGround(flappyData, windowHeight)) {
-            gameOver = true;
-        }
-        if (collisionTree) {
+        // Check for game over conditions - Added losing a Flappy and unified any tree collision
+        if (isOnGround(flappyData, windowHeight) 
+        or isLost(flappyBData, windowWidth) 
+        or isLost(flappyGData, windowWidth) 
+        or isLost(flappyYData, windowWidth)
+        or collisionTree) {
             gameOver = true;
         }
 
