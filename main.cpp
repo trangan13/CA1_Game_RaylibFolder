@@ -86,8 +86,8 @@ bool TimerDone(Timer* timer)
 int main ()
 {
    // Creating constants for the screen size // changing out of constants so I can clear them out when winning
-    float windowWidth {1360.0f}; // Reduce dimensions that match background ratio
-    float windowHeight {800.0f};
+    const int windowWidth {1360}; // Reduce dimensions that match background ratio
+    const int windowHeight {800};
     InitWindow( windowWidth, windowHeight, "All my flappys");
 
     // Custom Font: https://github.com/naoisecollins/2023MSc-SoftwareEngineering1-Class-Workspace/commit/1518ca81d2727b80735651599ee26f5905ebc22d
@@ -104,7 +104,7 @@ int main ()
 
     // Seems I need to play music outside the while loop https://www.raylib.com/examples/audio/loader.html?name=audio_music_stream
     PlayMusicStream(musicTense);
-    PauseMusicStream(musicRelief); // Might need to leave it paused to be ready
+
 
     // Sound settings
     int volumeSounds = 40;
@@ -122,8 +122,8 @@ int main ()
 
     // Setting up the array to 5 for now, will experiment. 
     const int sizeOfTree1{5};
-    const int sizeOfTree2{5};
-    const int sizeOfBranch{5};
+    const int sizeOfTree2{3};
+    const int sizeOfBranch{4};
     
     // Array of tree1
     AnimData trees1[sizeOfTree1]{};
@@ -592,7 +592,7 @@ int main ()
                 treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
-
+        /*
         // setting up timer for when catching last flappy, there wil be a message at 5 seconds and the game 
         // will be won at 10 seconds. 
         if (collisionFlappyY && gameWonTimer.Lifetime == 0) { // using two conditions so it does not start over
@@ -618,12 +618,8 @@ int main ()
             gravity = 0; // No more falling
             StopMusicStream(musicTense);
             PlayMusicStream(musicRelief); // Change of music
-
-            /* I want all obstacles to clear
-            clearing += 0.1; // Will test this out, as it is affecting all obstacles I don't want them to dissapear instantly
-            Commenting out, it seems I cannot assign this value to the animation*/ 
         }
-
+        */
 
 
 
