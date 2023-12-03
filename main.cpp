@@ -298,6 +298,7 @@ int main ()
     float messageLife = 5.0f;
     Timer loadTimer = {0};
     Timer messageTimer = {0};
+    Timer finishTimer = {0};
     StartTimer(&loadTimer, loadLife); // timer should start outside the loop
     StartTimer (&messageTimer, messageLife);
 
@@ -603,7 +604,23 @@ int main ()
             DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
         }
         
+        if(collisionFlappyY && finishTimer.Lifetime == 0){
+            StartTimer(&finishTimer, 10.0f);
+        }
+        if (collisionFlappyY && finishTimer.Lifetime > 0) {
+            UpdateTimer(&finishTimer);
+        }
+            // After 5 seconds show message
+        if (collisionFlappyY && finishTimer.Lifetime <= 5) {
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/1.5f}, 60, 3, BLACK); // making the floats to prevent a vector error
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/1.5f-2},  60, 3, YELLOW);          
+        }
 
+        if (collisionFlappyY && TimerDone(&finishTimer))
+        {
+            gameWon = true
+        }
+        
 
 
 
