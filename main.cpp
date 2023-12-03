@@ -24,6 +24,12 @@ bool isLost(AnimData data, int windowWidth)
     return data.pos.x <= windowWidth*0;
 }
 
+// Moving here as they were too far low
+// Set this to finish the game when touching the ground or an obstacle
+bool gameOver = false;
+// winning the game
+bool gameWon = false;
+
 
 // This is a function for updating animation frames for all objects https://www.udemy.com/course/cpp-fundamentals/learn/lecture/26799168#overview
 AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
@@ -121,9 +127,9 @@ int main ()
     Texture2D branch = LoadTexture("textures/branch.png");
 
     // Setting up the array to 5 for now, will experiment. 
-    const int sizeOfTree1{5};
-    const int sizeOfTree2{3};
-    const int sizeOfBranch{4};
+    const int sizeOfTree1{6};
+    const int sizeOfTree2{4};
+    const int sizeOfBranch{5};
     
     // Array of tree1
     AnimData trees1[sizeOfTree1]{};
@@ -204,7 +210,7 @@ int main ()
     flappyGData.rec.x = 0;
     flappyGData.rec.y = 0;
 
-    flappiesTotal += GetRandomValue(1000,2000); // In my sprite green goes first
+    flappiesTotal += GetRandomValue(1000,3000); // In my sprite green goes first
     flappyGData.pos.x = windowWidth + flappiesTotal;
     flappyGData.pos.y = windowHeight/2 - flappyGData.rec.height; 
     flappyGData.frame = 0; 
@@ -232,7 +238,7 @@ int main ()
     flappyYData.rec.x = 0;
     flappyYData.rec.y = 0;
     
-    flappiesTotal += GetRandomValue(2000,3000);
+    flappiesTotal += GetRandomValue(4000,6000);
     flappyYData.pos.x = windowWidth + flappiesTotal; 
     flappyYData.pos.y = windowHeight/2 - flappyYData.rec.height; 
     flappyYData.frame = 0; 
@@ -257,8 +263,13 @@ int main ()
     flappyData.pos.y = windowHeight/2 - flappyData.rec.height; // change this for flappy to appear in the middle
     flappyData.frame = 0; 
     flappyData.runningTime = 0.0;
-    flappyData.updateTime = 1.0/12.0; // how often a frame is changed
     flappyData.flappyCount = 0; // Will set as 0 for normal, I was getting some errors. 
+    // I want flappy to flap much quicker when falling(gameover)
+    if(!gameOver){
+        flappyData.updateTime = 1.0/12.0;
+    } else {
+        flappyData.updateTime = 1.0/24.0;
+    }
 
 
     // Need to setup flap movement
@@ -266,7 +277,7 @@ int main ()
     // Set initial Velocity
     int velocity {0}; //pixels/frame
      // Gravity
-    int gravity {500}; // (pixels/s)/s
+    int gravity {800}; // (pixels/s)/s
 
 
     // Background image loading
@@ -277,11 +288,6 @@ int main ()
     float mgX{};
     Texture2D foreground = LoadTexture("Textures/parallax-forest-front-trees.png");
     float fgX{};
-
-    // Set this to finish the game when touching the ground or an obstacle
-    bool gameOver = false;
-    // winning the game
-    bool gameWon = false;
 
     // Setting up collision booleans for interaction with obstacles and flappies // Moving them outside the while loop
     bool collisionTree{};
@@ -295,7 +301,7 @@ int main ()
 
     // My timer for loading
     float loadLife = 10.0f;
-    float messageLife = 5.0f;
+    float messageLife = 7.0f; // making this longer
     Timer loadTimer = {0};
     Timer messageTimer = {0};
     Timer finishTimer = {0};
@@ -306,6 +312,7 @@ int main ()
     // This condition loop was not working when checking for the music to be ready, used the timer only instead
     while(!WindowShouldClose() && !TimerDone(&loadTimer)){ // Ryan Bissett helped me with this condition through the Discord Channel for class
 
+        UpdateMusicStream(musicTense); 
         // Begin Drawing
         BeginDrawing();
         ClearBackground(WHITE);
@@ -469,7 +476,7 @@ int main ()
         
         for (AnimData tree1 : trees1) // Collision with trees1
         {
-            float pad{80}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad{60}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree1Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree1.pos.x + pad, 
                 tree1.pos.y + pad,
@@ -491,7 +498,7 @@ int main ()
 
         for (AnimData tree2 : trees2) // Collision with trees2
         {
-            float pad2{150}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad2{130}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree2.pos.x + pad2, 
                 tree2.pos.y + pad2,
@@ -513,7 +520,7 @@ int main ()
 
         for (AnimData branch : branches) // Collision with branches
         {
-            float pad3{80}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad3{60}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 branch.pos.x + pad3, 
                 branch.pos.y + pad3,
@@ -568,7 +575,7 @@ int main ()
                 PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 2; // Updating the Y position to change the sprite and show a child
                 flapVel = flapVel - flapVel*.3; // I will reduce a percentage 10% // changed to 30% to feel the weight
-                treeVel = treeVel + treeVel *.1; // increase velocity of obstacles
+                treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
                 flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
             }
         if (!collisionFlappyG && CheckCollisionRecs(flappyRec, flappyGRec))
@@ -576,9 +583,9 @@ int main ()
                 collisionFlappyG = true;
                 PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 1; // Correcting again with the position of my sprite
-                 flapVel = flapVel - flapVel*.1; // I will reduce a percentage 10%
+                 flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
                 treeVel = treeVel + treeVel *.3; // increase velocity of obstacles
-                flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
+                flappiesVel = flappiesVel + flappiesVel*.2; // increase volocity of next flappy
             }
         if (!collisionFlappyY && CheckCollisionRecs(flappyRec, flappyYRec))
             {
@@ -586,13 +593,11 @@ int main ()
                 PlaySound(soundMama); // Adding a mama cry when saved
                 flappyData.flappyCount = 3;
                 flapVel = flapVel - flapVel*.2; // I will reduce a percentage 10%
-                treeVel = treeVel + treeVel *.2; // increase velocity of obstacles
-                flappiesVel = flappiesVel + flappiesVel*.1; // increase volocity of next flappy
+                treeVel = treeVel + treeVel *.3; // increase velocity of obstacles
             }
 
 
-        // Draw Flappies // Adding a condition to collision
-
+        // Draw Flappies // Adding a condition to collision so they dissapear
          
         if(!collisionFlappyG){
             DrawTextureRec(flappyG, flappyGData.rec, flappyGData.pos, WHITE);
@@ -604,46 +609,57 @@ int main ()
             DrawTextureRec(flappyY, flappyYData.rec, flappyYData.pos, WHITE);
         }
         
+        // Starting winning condition from third flappy collision. Start time for final countdown
         if(collisionFlappyY && finishTimer.Lifetime == 0){
             StartTimer(&finishTimer, 10.0f);
         }
         if (collisionFlappyY && finishTimer.Lifetime > 0) {
             UpdateTimer(&finishTimer);
         }
-            // After 5 seconds show message
-        if (collisionFlappyY && finishTimer.Lifetime <= 5) {
+            // After 5 seconds show message // added third condition so it dissapears when the second message is shown
+        if (collisionFlappyY && finishTimer.Lifetime <= 5 && !TimerDone(&finishTimer)) {
             DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-354, windowHeight/1.5f}, 60, 3, BLACK); // making the floats to prevent a vector error
-            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/1.5f-2},  60, 3, YELLOW);          
+            DrawTextEx(customFont, "You are almost there", (Vector2){windowWidth/2.0f-350, windowHeight/1.5f-2},  60, 3, ORANGE);          
         }
 
-        if (collisionFlappyY && TimerDone(&finishTimer))
+        if (collisionFlappyY && TimerDone(&finishTimer)) // winning condition
         {
-            gameWon = true
+            gameWon = true;
+            PauseMusicStream(musicTense);
+            PlayMusicStream(musicRelief); // change music
+            velocity = 0; // Setup a nice flight no more button action
+            gravity = 0; // no more falling
+            treeVel = -1000; // clearing obstacles
+            DrawTextEx(customFont, "You saved your flappys!", (Vector2){windowWidth/2.0f-354, windowHeight/1.5f}, 80, 3, BLACK); // making the floats to prevent a vector error
+            DrawTextEx(customFont, "You saved your flappys!", (Vector2){windowWidth/2.0f-350, windowHeight/1.5f-2},  80, 3, YELLOW);          
+
         }
         
 
 
 
-
-        
-        // Check for game over conditions - Added losing a Flappy and unified any tree collision
-        if (isOnGround(flappyData, windowHeight) or collisionTree) {
-            gameOver = true;
-        } else if (!collisionFlappyB and isLost(flappyBData, windowWidth)) // Updated the conditions only to check if we don't rescue them first
-        {
-            gameOver = true;
-        } else if (!collisionFlappyG and isLost(flappyGData, windowWidth))
-        {
-            gameOver = true;
-        } else if (!collisionFlappyY and isLost(flappyYData, windowWidth))
-        {
-            gameOver = true;
+        // Wrapping this up so we cannot lose once the game is over (in case there are an lingering trees)
+        if(!gameWon){
+            // Check for game over conditions - Added losing a Flappy and unified any tree collision
+            if (isOnGround(flappyData, windowHeight) or collisionTree) {
+                gameOver = true;
+            } else if (!collisionFlappyB and isLost(flappyBData, windowWidth)) // Updated the conditions only to check if we don't rescue them first
+            {
+                gameOver = true;
+            } else if (!collisionFlappyG and isLost(flappyGData, windowWidth))
+            {
+                gameOver = true;
+            } else if (!collisionFlappyY and isLost(flappyYData, windowWidth))
+            {
+                gameOver = true;
+            }
         }
 
         // Changed to DrawTextEx for custom font
         if (gameOver) {
-     DrawTextEx(customFont, "Who will save your flappys now", (Vector2){windowWidth/2-353, windowHeight/2-49}, 55, 3, BLACK); // Added a second one for visibility
-     DrawTextEx(customFont, "Who will save your flappys now", (Vector2){windowWidth/2-350, windowHeight/2-50},  55, 3, RED);
+        flapVel = 300; // falling hard
+     DrawTextEx(customFont, "Who will save your flappys now?", (Vector2){windowWidth/2-353, windowHeight/2-49}, 55, 3, BLACK); // Added a second one for visibility
+     DrawTextEx(customFont, "Who will save your flappys now?", (Vector2){windowWidth/2-350, windowHeight/2-50},  55, 3, RED);
         }
 
 
