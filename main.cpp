@@ -68,7 +68,6 @@ void StartTimer(Timer* timer, float lifetime)
         timer->Lifetime = lifetime;
 }
 
-// update a timer with the current frame time
 void UpdateTimer(Timer* timer)
 {
     // subtract this frame from the timer if it's not allready expired
@@ -321,11 +320,11 @@ int main ()
         DrawTextureEx(background, (Vector2){0, 0}, 0.0, 5.0, WHITE);
 
         if (!TimerDone(&messageTimer)){
-        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-354, windowHeight/2-48}, 100, 3, BLACK); 
-        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-350, windowHeight/2-50},  100, 3, RED);
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-494, windowHeight/2-48}, 100, 3, BLACK); 
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-490, windowHeight/2-50},  100, 3, RED);
         } else {
-            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-354, windowHeight/2-48}, 120, 4, BLACK); 
-            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-350, windowHeight/2-50},  120, 4, RED);
+            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-494, windowHeight/2-48}, 120, 4, BLACK); 
+            DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-490, windowHeight/2-50},  120, 4, RED);
             
         }
 
@@ -539,28 +538,6 @@ int main ()
             }
         }
 
-        for (AnimData branch : branches) // Collision with FlappyB
-        {
-            float pad3{50}; // Adding a pad to reduce the area of collision in the corners. 
-            Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
-                branch.pos.x + pad3, 
-                branch.pos.y + pad3,
-                branch.rec.width - 2*pad3,
-                branch.rec.height - 2*pad3 
-            };
-            Rectangle flappyRec {
-                flappyData.pos.x,
-                flappyData.pos.y,
-                flappyData.rec.width,
-                flappyData.rec.height
-
-            };
-            if (CheckCollisionRecs(tree2Rec, flappyRec))
-            {
-                collisionTree = true;
-            }
-        }
-
         
         // Collision with Flappies, since they are not arrays I think I can just create the rectangles to check for collision
         Rectangle flappyRec = {flappyData.pos.x, flappyData.pos.y, flappyData.rec.width, flappyData.rec.height};
@@ -610,7 +587,7 @@ int main ()
         }
         
         // Starting winning condition from third flappy collision. Start time for final countdown
-        if(collisionFlappyY && finishTimer.Lifetime == 0){
+        if(collisionFlappyY && finishTimer.Lifetime == 0 && !gameOver){
             StartTimer(&finishTimer, 10.0f);
         }
         if (collisionFlappyY && finishTimer.Lifetime > 0) {
