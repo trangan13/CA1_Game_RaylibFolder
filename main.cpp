@@ -127,7 +127,7 @@ int main ()
     Texture2D branch = LoadTexture("textures/branch.png");
 
     // Setting up the array to 5 for now, will experiment. 
-    const int sizeOfTree1{6};
+    const int sizeOfTree1{8};
     const int sizeOfTree2{4};
     const int sizeOfBranch{5};
     
@@ -268,7 +268,7 @@ int main ()
     if(!gameOver){
         flappyData.updateTime = 1.0/12.0;
     } else {
-        flappyData.updateTime = 1.0/24.0;
+        flappyData.updateTime = 1.0/48.0;
     }
 
 
