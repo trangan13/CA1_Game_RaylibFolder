@@ -2,6 +2,8 @@
 
 ## All My Flappys - Game created using Raylib
 
+Flap with Spacebar, save your flappys.
+
 Video: https://youtu.be/5qhL1HTh9pg
 
 
