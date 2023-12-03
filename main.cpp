@@ -320,8 +320,8 @@ int main ()
         DrawTextureEx(background, (Vector2){0, 0}, 0.0, 5.0, WHITE);
 
         if (!TimerDone(&messageTimer)){
-        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-494, windowHeight/2-48}, 100, 3, BLACK); 
-        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-490, windowHeight/2-50},  100, 3, RED);
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-474, windowHeight/2-48}, 100, 3, BLACK); 
+        DrawTextEx(customFont, "The forest is on FIRE!", (Vector2){windowWidth/2-470, windowHeight/2-50},  100, 3, RED);
         } else {
             DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-494, windowHeight/2-48}, 120, 4, BLACK); 
             DrawTextEx(customFont, "SAVE YOUR FLAPPYS!", (Vector2){windowWidth/2-490, windowHeight/2-50},  120, 4, RED);
