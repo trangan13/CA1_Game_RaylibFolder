@@ -475,7 +475,7 @@ int main ()
         
         for (AnimData tree1 : trees1) // Collision with trees1
         {
-            float pad{60}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad{70}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree1Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree1.pos.x + pad, 
                 tree1.pos.y + pad,
@@ -497,7 +497,7 @@ int main ()
 
         for (AnimData tree2 : trees2) // Collision with trees2
         {
-            float pad2{130}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad2{150}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 tree2.pos.x + pad2, 
                 tree2.pos.y + pad2,
@@ -519,7 +519,7 @@ int main ()
 
         for (AnimData branch : branches) // Collision with branches
         {
-            float pad3{60}; // Adding a pad to reduce the area of collision in the corners. 
+            float pad3{80}; // Adding a pad to reduce the area of collision in the corners. 
             Rectangle tree2Rec{ // We need to locate the tree on the screen, not on the sprite
                 branch.pos.x + pad3, 
                 branch.pos.y + pad3,
